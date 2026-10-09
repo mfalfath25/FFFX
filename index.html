@@ -1,0 +1,4095 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image & Video Effects Lab</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #0b0c10;
+        color: #e8e8ec;
+        display: grid;
+        grid-template-columns: 310px 1fr;
+        grid-template-rows: 100vh;
+        overflow: hidden;
+      }
+
+      /* ---------- Sidebar ---------- */
+      aside {
+        background: #121319;
+        border-right: 1px solid #20222c;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .brand {
+        padding: 16px 18px 12px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .brand-badge {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #00ff88;
+        box-shadow: 0 0 10px #00ff88;
+      }
+      .brand small {
+        display: block;
+        color: #6a6c7c;
+        font-weight: 400;
+        font-size: 0.72rem;
+        margin-top: 2px;
+      }
+
+      .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 0 12px 14px;
+        border-bottom: 1px solid #20222c;
+      }
+      .menu button {
+        text-align: left;
+        background: none;
+        border: 1px solid transparent;
+        color: #989aa8;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .menu button:hover {
+        background: #1a1c26;
+        color: #e8e8ec;
+      }
+      .menu button.active {
+        background: #1f233a;
+        border-color: #3f477c;
+        color: #fff;
+      }
+      .menu button.active::after {
+        content: '●';
+        font-size: 0.65rem;
+        color: #7c83ff;
+      }
+
+      .panel {
+        padding: 16px 18px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .group h3 {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: #7c83ff;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .control {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 11px;
+        font-size: 0.77rem;
+        color: #b0b2c0;
+      }
+      .control .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      .control output {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+        font-family: monospace;
+      }
+      .control.inline {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      input[type='range'] {
+        width: 100%;
+        accent-color: #7c83ff;
+        height: 5px;
+        cursor: pointer;
+      }
+      input[type='color'] {
+        width: 32px;
+        height: 24px;
+        padding: 0;
+        border: 1px solid #2c2f3c;
+        border-radius: 4px;
+        background: none;
+        cursor: pointer;
+      }
+      input[type='text'].text-input {
+        width: 100%;
+        background: #191b24;
+        color: #e8e8ec;
+        border: 1px solid #272a38;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input[type='text'].text-input:focus {
+        border-color: #7c83ff;
+      }
+      #stageClearBtn {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: none;
+        background: rgba(18, 19, 25, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        transition: all 0.15s ease;
+        z-index: 10;
+      }
+      #stageClearBtn:hover {
+        background: #252b52;
+        border-color: #7c83ff;
+        transform: translateY(-1px);
+      }
+      #stageClearBtn:active {
+        transform: translateY(0);
+      }
+      select,
+      button.btn {
+        background: #191b24;
+        color: #e8e8ec;
+        border: 1px solid #272a38;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      select:hover,
+      button.btn:hover {
+        border-color: #525670;
+      }
+      button.btn-primary {
+        background: #252b52;
+        border-color: #4b5596;
+        color: #fff;
+      }
+      button.btn-primary:hover {
+        background: #31396b;
+      }
+
+      /* ---------- Main Area ---------- */
+      main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 18px;
+        border-bottom: 1px solid #20222c;
+        font-size: 0.8rem;
+        color: #989aa8;
+        background: #111218;
+      }
+      .toolbar .spacer {
+        flex: 1;
+      }
+      .stats {
+        font-size: 0.73rem;
+        color: #6a6c7c;
+        font-variant-numeric: tabular-nums;
+        font-family: monospace;
+      }
+      .source-indicator {
+        font-size: 0.7rem;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: #1e2233;
+        color: #8c9eff;
+        font-family: monospace;
+      }
+
+      .stage-wrap {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        min-height: 0;
+        background: radial-gradient(circle at center, #151722 0%, #0b0c10 100%);
+      }
+      #stage {
+        position: relative;
+        line-height: 0;
+        box-shadow:
+          0 25px 60px rgba(0, 0, 0, 0.7),
+          0 0 0 1px #222533;
+        cursor: crosshair;
+        background: #000;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+        max-height: calc(100vh - 120px);
+      }
+      #dropHint {
+        position: absolute;
+        inset: 0;
+        display: none;
+        place-items: center;
+        background: rgba(14, 16, 26, 0.88);
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #00ff88;
+        border: 2px dashed #00ff88;
+        pointer-events: none;
+      }
+      #stage.dragging #dropHint {
+        display: grid;
+      }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <div>
+          Image & Video Effects Lab
+          <small>interactive shader & creative vision studio</small>
+        </div>
+      </div>
+      <nav class="menu" id="menu"></nav>
+      <div class="panel" id="panel"></div>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <label>
+          Media Source
+          <select id="preset">
+            <option value="motion-demo">
+              ▶ Animated Motion Demo (Simulated Video)
+            </option>
+            <option value="sunset">Sunset (Image)</option>
+            <option value="portrait">Portrait (Image)</option>
+            <option value="flower">Flower (Image)</option>
+          </select>
+        </label>
+        <button class="btn" id="openBtn">Open Media…</button>
+        <input type="file" id="file" accept="image/*,video/*" hidden />
+        <button class="btn" id="webcamBtn">Webcam</button>
+        <button class="btn" id="saveBtn">Save Frame</button>
+        <span class="spacer"></span>
+        <span class="source-indicator" id="sourceBadge">MOTION-DEMO</span>
+        <span class="stats" id="stats"></span>
+      </div>
+      <div class="stage-wrap">
+        <div id="stage">
+          <canvas id="canvas"></canvas>
+          <div id="dropHint">Drop Image or Video to Load</div>
+          <button id="stageClearBtn" title="Clear sketch canvas (Shortcut: C)">
+            🧹 Clear Sketch (C)
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const ROOT = 64 // canvas dimensions snapped to multiples of this
+      const TAU = Math.PI * 2
+
+      // ======================================================================
+      // Shared Media Pipeline & Environment
+      // ======================================================================
+      const canvas = document.getElementById('canvas')
+      const ctx = canvas.getContext('2d')
+      const stage = document.getElementById('stage')
+      const statsEl = document.getElementById('stats')
+      const sourceBadge = document.getElementById('sourceBadge')
+
+      const env = {
+        W: 0,
+        H: 0,
+        time: 0,
+        sat: null, // summed-area table for quadtree
+        cursor: { x: 0, y: 0, targetX: 0, targetY: 0, lastMoveAt: 0 },
+        // Offscreen canvas storing current source frame
+        sourceCanvas: document.createElement('canvas'),
+        sourceCtx: null,
+        // Source state
+        sourceType: 'demo', // 'image' | 'video' | 'webcam' | 'demo'
+        sourceVideo: null,
+        sourceImage: null,
+        demoState: null,
+      }
+      env.sourceCtx = env.sourceCanvas.getContext('2d', {
+        willReadFrequently: true,
+      })
+
+      // ---------------- Summed-Area Table (Quadtree) ----------------
+      function buildTables(imageData) {
+        const { W, H } = env
+        const data = imageData.data
+        const stride = W + 1
+        const size = stride * (H + 1)
+        const r = new Float64Array(size)
+        const g = new Float64Array(size)
+        const b = new Float64Array(size)
+        const l = new Float64Array(size)
+        const l2 = new Float64Array(size)
+
+        for (let y = 0; y < H; y++) {
+          let rr = 0,
+            gg = 0,
+            bb = 0,
+            ll = 0,
+            ll2 = 0
+          for (let x = 0; x < W; x++) {
+            const i = (y * W + x) * 4
+            const luma =
+              0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+            rr += data[i]
+            gg += data[i + 1]
+            bb += data[i + 2]
+            ll += luma
+            ll2 += luma * luma
+            const idx = (y + 1) * stride + (x + 1)
+            const up = y * stride + (x + 1)
+            r[idx] = r[up] + rr
+            g[idx] = g[up] + gg
+            b[idx] = b[up] + bb
+            l[idx] = l[up] + ll
+            l2[idx] = l2[up] + ll2
+          }
+        }
+        env.sat = { r, g, b, l, l2, stride }
+      }
+
+      function rectSum(table, x, y, s) {
+        const st = env.sat.stride
+        return (
+          table[(y + s) * st + (x + s)] -
+          table[y * st + (x + s)] -
+          table[(y + s) * st + x] +
+          table[y * st + x]
+        )
+      }
+
+      function lumaStdDev(x, y, s) {
+        const n = s * s
+        const mean = rectSum(env.sat.l, x, y, s) / n
+        const variance = rectSum(env.sat.l2, x, y, s) / n - mean * mean
+        return Math.sqrt(Math.max(0, variance))
+      }
+
+      function hash(x, y, s) {
+        let h =
+          Math.imul(x, 374761393) +
+          Math.imul(y, 668265263) +
+          Math.imul(s, 1274126177)
+        h = Math.imul(h ^ (h >>> 13), 1274126177)
+        return ((h ^ (h >>> 16)) >>> 0) / 4294967296
+      }
+
+      // ======================================================================
+      // EFFECT 1: quadtree-bokeh
+      // ======================================================================
+      const quadtreeBokeh = {
+        id: 'quadtree-bokeh',
+        label: 'quadtree-bokeh',
+        groups: [
+          {
+            title: 'Focus',
+            controls: [
+              {
+                key: 'shape',
+                label: 'Focus shape',
+                type: 'select',
+                options: ['square', 'circle'],
+                value: 'square',
+              },
+              {
+                key: 'radius',
+                label: 'Focus size',
+                type: 'range',
+                min: 20,
+                max: 400,
+                step: 1,
+                value: 110,
+                unit: 'px',
+              },
+              {
+                key: 'falloff',
+                label: 'Falloff distance',
+                type: 'range',
+                min: 40,
+                max: 800,
+                step: 1,
+                value: 320,
+                unit: 'px',
+              },
+              {
+                key: 'minSize',
+                label: 'Finest square',
+                type: 'select',
+                options: [1, 2, 4, 8],
+                value: 2,
+              },
+              {
+                key: 'maxSize',
+                label: 'Coarsest square',
+                type: 'select',
+                options: [16, 32, 64],
+                value: 64,
+              },
+              {
+                key: 'skipFlat',
+                label: 'Skip flat regions',
+                type: 'checkbox',
+                value: true,
+              },
+            ],
+          },
+          {
+            title: 'Alive',
+            controls: [
+              {
+                key: 'speed',
+                label: 'Speed',
+                type: 'range',
+                min: 0,
+                max: 4,
+                step: 0.05,
+                value: 1,
+                unit: 'x',
+              },
+              {
+                key: 'shimmer',
+                label: 'Edge shimmer',
+                type: 'range',
+                min: 0,
+                max: 160,
+                step: 1,
+                value: 60,
+                unit: 'px',
+              },
+              {
+                key: 'glitter',
+                label: 'Glitter',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: 0.35,
+                unit: '',
+              },
+              {
+                key: 'breathing',
+                label: 'Focus breathing',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: 0.25,
+                unit: '',
+              },
+              {
+                key: 'wander',
+                label: 'Wander when idle',
+                type: 'checkbox',
+                value: true,
+              },
+            ],
+          },
+          {
+            title: 'Display',
+            controls: [
+              {
+                key: 'showGrid',
+                label: 'Show grid',
+                type: 'checkbox',
+                value: false,
+              },
+              {
+                key: 'gridWidth',
+                label: 'Grid width',
+                type: 'range',
+                min: 0.01,
+                max: 10,
+                step: 0.01,
+                value: 1,
+                unit: 'px',
+              },
+              {
+                key: 'gridColor',
+                label: 'Grid color',
+                type: 'color',
+                value: '#000000',
+              },
+            ],
+          },
+        ],
+
+        flatThreshold: 6,
+        leaves: [],
+
+        draw(v, dt) {
+          const { W, H, cursor } = env
+          env.time += dt * v.speed
+
+          if (v.wander && performance.now() - cursor.lastMoveAt > 2500) {
+            cursor.targetX = W * (0.5 + 0.32 * Math.sin(env.time * 0.55))
+            cursor.targetY = H * (0.5 + 0.3 * Math.sin(env.time * 0.83 + 1.2))
+          }
+          cursor.x += (cursor.targetX - cursor.x) * 0.18
+          cursor.y += (cursor.targetY - cursor.y) * 0.18
+
+          const radius =
+            v.radius * (1 + v.breathing * 0.3 * Math.sin(env.time * 0.9))
+          const params = { ...v, radius, time: env.time }
+
+          this.leaves = []
+          for (let y = 0; y < H; y += ROOT) {
+            for (let x = 0; x < W; x += ROOT) {
+              this.subdivide(x, y, ROOT, params)
+            }
+          }
+          this.render(v)
+          return `${(this.leaves.length / 6).toLocaleString()} squares`
+        },
+
+        distance(x, y, s, shape) {
+          const { cursor } = env
+          const dx = Math.max(x - cursor.x, 0, cursor.x - (x + s))
+          const dy = Math.max(y - cursor.y, 0, cursor.y - (y + s))
+          return shape === 'square' ? Math.max(dx, dy) : Math.hypot(dx, dy)
+        },
+
+        allowedSize(x, y, s, p) {
+          let d = this.distance(x, y, s, p.shape)
+          if (p.shimmer > 0) {
+            d += p.shimmer * Math.sin(p.time * 2.2 + hash(x, y, s) * TAU)
+          }
+          if (d <= p.radius) return p.minSize
+          const t = Math.min(1, (d - p.radius) / p.falloff)
+          return p.minSize + (p.maxSize - p.minSize) * t * t
+        },
+
+        subdivide(x, y, s, p) {
+          const wantSplit = s > p.minSize && s > this.allowedSize(x, y, s, p)
+          const isFlat =
+            p.skipFlat && wantSplit && lumaStdDev(x, y, s) < this.flatThreshold
+
+          if (wantSplit && !isFlat) {
+            const h = s / 2
+            this.subdivide(x, y, h, p)
+            this.subdivide(x + h, y, h, p)
+            this.subdivide(x, y + h, h, p)
+            this.subdivide(x + h, y + h, h, p)
+            return
+          }
+
+          const n = s * s
+          this.leaves.push(
+            x,
+            y,
+            s,
+            rectSum(env.sat.r, x, y, s) / n,
+            rectSum(env.sat.g, x, y, s) / n,
+            rectSum(env.sat.b, x, y, s) / n,
+          )
+        },
+
+        render(v) {
+          const { W, H, time } = env
+          const leaves = this.leaves
+          const gutterGrid = v.showGrid && v.gridWidth >= 1
+          const hairlineGrid = v.showGrid && v.gridWidth < 1
+
+          ctx.fillStyle = gutterGrid ? v.gridColor : '#000'
+          ctx.fillRect(0, 0, W, H)
+
+          for (let i = 0; i < leaves.length; i += 6) {
+            const x = leaves[i],
+              y = leaves[i + 1],
+              s = leaves[i + 2]
+            let r = leaves[i + 3],
+              g = leaves[i + 4],
+              b = leaves[i + 5]
+
+            if (v.glitter > 0) {
+              const phase = hash(x, y, s + 101)
+              const flicker =
+                1 + 0.07 * v.glitter * Math.sin(time * 3 + phase * 60)
+              const pulse = Math.max(0, Math.sin(time * 1.7 + phase * 80))
+              const sparkle =
+                Math.pow(pulse, 16) *
+                v.glitter *
+                (0.35 + (0.65 * s) / v.maxSize)
+              r = Math.min(255, r * flicker + (255 - r) * sparkle)
+              g = Math.min(255, g * flicker + (255 - g) * sparkle)
+              b = Math.min(255, b * flicker + (255 - b) * sparkle)
+            }
+
+            ctx.fillStyle = `rgb(${r | 0},${g | 0},${b | 0})`
+            const inset = gutterGrid ? Math.min(v.gridWidth / 2, s * 0.25) : 0
+            ctx.fillRect(x + inset, y + inset, s - inset * 2, s - inset * 2)
+          }
+
+          if (hairlineGrid) {
+            ctx.globalAlpha = v.gridWidth
+            ctx.strokeStyle = v.gridColor
+            ctx.lineWidth = 1
+            ctx.beginPath()
+            for (let i = 0; i < leaves.length; i += 6) {
+              ctx.rect(leaves[i], leaves[i + 1], leaves[i + 2], leaves[i + 2])
+            }
+            ctx.stroke()
+            ctx.globalAlpha = 1
+          }
+        },
+      }
+
+      // ======================================================================
+      // EFFECT 2: blob-tracker
+      // Inspired by basementstudio/shader-lab blob tracking layer.
+      // Detects motion / bright regions in image or video, frames them with
+      // CCTV/transform edit-mode boxes, and animates scattered tech nodes.
+      // ======================================================================
+      const blobTracker = {
+        id: 'blob-tracker',
+        label: 'blob-tracker',
+        groups: [
+          {
+            title: 'Detection',
+            controls: [
+              {
+                key: 'detectMode',
+                label: 'Detection mode',
+                type: 'select',
+                options: ['motion', 'brightness', 'hybrid'],
+                value: 'motion',
+              },
+              {
+                key: 'sensitivity',
+                label: 'Sensitivity',
+                type: 'range',
+                min: 0.05,
+                max: 0.95,
+                step: 0.01,
+                value: 0.4,
+                unit: '',
+              },
+              {
+                key: 'minSize',
+                label: 'Min blob size',
+                type: 'range',
+                min: 10,
+                max: 150,
+                step: 5,
+                value: 25,
+                unit: 'px',
+              },
+              {
+                key: 'maxBlobs',
+                label: 'Max blobs',
+                type: 'range',
+                min: 1,
+                max: 10,
+                step: 1,
+                value: 5,
+                unit: '',
+              },
+              {
+                key: 'smoothing',
+                label: 'Tracking smooth',
+                type: 'range',
+                min: 0.05,
+                max: 0.8,
+                step: 0.05,
+                value: 0.25,
+                unit: '',
+              },
+            ],
+          },
+          {
+            title: 'Scatter Nodes',
+            controls: [
+              {
+                key: 'nodeShape',
+                label: 'Scatter asset',
+                type: 'select',
+                options: [
+                  'square',
+                  'diamond',
+                  'bracket',
+                  'crosshair',
+                  'circle',
+                  'triangle',
+                  'mixed',
+                ],
+                value: 'square',
+              },
+              {
+                key: 'nodeCount',
+                label: 'Node amount',
+                type: 'range',
+                min: 4,
+                max: 48,
+                step: 1,
+                value: 16,
+                unit: ' / blob',
+              },
+              {
+                key: 'nodeSize',
+                label: 'Node size',
+                type: 'range',
+                min: 3,
+                max: 24,
+                step: 1,
+                value: 8,
+                unit: 'px',
+              },
+              {
+                key: 'jitter',
+                label: 'Animation jitter',
+                type: 'range',
+                min: 0,
+                max: 3,
+                step: 0.1,
+                value: 1.2,
+                unit: 'x',
+              },
+              {
+                key: 'connectNodes',
+                label: 'Connect nodes (mesh)',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'nodeColor',
+                label: 'Node color',
+                type: 'color',
+                value: '#00ff88',
+              },
+              {
+                key: 'accentColor',
+                label: 'Accent color',
+                type: 'color',
+                value: '#ffffff',
+              },
+            ],
+          },
+          {
+            title: 'Edit Mode Framing',
+            controls: [
+              {
+                key: 'showBoundingBox',
+                label: 'Transform edit box',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'showHandles',
+                label: 'Edit corner handles',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'showBrackets',
+                label: 'CCTV corner brackets',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'showLabels',
+                label: 'HUD coordinate tags',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'showCrosshair',
+                label: 'Centroid crosshair',
+                type: 'checkbox',
+                value: true,
+              },
+              {
+                key: 'boxColor',
+                label: 'Box / bracket color',
+                type: 'color',
+                value: '#00ff88',
+              },
+            ],
+          },
+          {
+            title: 'Background & Style',
+            controls: [
+              {
+                key: 'backgroundDim',
+                label: 'Background dim',
+                type: 'range',
+                min: 0,
+                max: 0.95,
+                step: 0.05,
+                value: 0.35,
+                unit: '',
+              },
+              {
+                key: 'blendMode',
+                label: 'Node glow blend',
+                type: 'select',
+                options: ['screen', 'lighter', 'source-over'],
+                value: 'screen',
+              },
+            ],
+          },
+        ],
+
+        // Analysis state
+        analysisCanvas: document.createElement('canvas'),
+        analysisCtx: null,
+        bgData: null, // running background model for robust motion detection
+        trackedBlobs: [], // smooth tracked bounding boxes + persistent scattered nodes
+
+        init() {
+          this.analysisCtx = this.analysisCanvas.getContext('2d', {
+            willReadFrequently: true,
+          })
+        },
+
+        draw(v, dt) {
+          const { W, H } = env
+          env.time += dt
+
+          if (!this.analysisCtx) this.init()
+
+          // 1. Detect blobs from downsampled current frame
+          const rawBlobs = this.detectBlobs(v)
+
+          // 2. Temporally smooth blob bounding boxes and maintain node state
+          this.updateTrackedBlobs(rawBlobs, v, dt)
+
+          // 3. Render: Draw background media with dimming
+          ctx.fillStyle = '#0a0b10'
+          ctx.fillRect(0, 0, W, H)
+
+          if (v.backgroundDim < 1) {
+            ctx.save()
+            ctx.globalAlpha = 1 - v.backgroundDim
+            ctx.drawImage(env.sourceCanvas, 0, 0, W, H)
+            ctx.restore()
+          }
+
+          // 4. Render blob tracking edit-mode overlays and scattered nodes
+          this.renderTracking(v)
+
+          return `${this.trackedBlobs.length} tracked blobs · ${this.trackedBlobs.reduce((acc, b) => acc + b.nodes.length, 0)} nodes`
+        },
+
+        detectBlobs(v) {
+          const { W, H } = env
+          // Grid analysis resolution
+          const GW = 96
+          const GH = Math.max(24, Math.round(96 * (H / W)))
+
+          if (
+            this.analysisCanvas.width !== GW ||
+            this.analysisCanvas.height !== GH
+          ) {
+            this.analysisCanvas.width = GW
+            this.analysisCanvas.height = GH
+            this.bgData = null
+          }
+
+          // Downsample current source frame into analysis canvas
+          this.analysisCtx.drawImage(env.sourceCanvas, 0, 0, GW, GH)
+          const currImgData = this.analysisCtx.getImageData(0, 0, GW, GH)
+          const data = currImgData.data
+
+          // Initialize background model on first run or dimension change
+          if (!this.bgData || this.bgData.length !== GW * GH * 3) {
+            this.bgData = new Float32Array(GW * GH * 3)
+            for (let i = 0; i < GW * GH; i++) {
+              this.bgData[i * 3] = data[i * 4]
+              this.bgData[i * 3 + 1] = data[i * 4 + 1]
+              this.bgData[i * 3 + 2] = data[i * 4 + 2]
+            }
+          }
+
+          const energyGrid = new Float32Array(GW * GH)
+
+          // Calibrated threshold based on sensitivity slider
+          let threshold
+          if (v.detectMode === 'motion') {
+            threshold = 0.02 + (1 - v.sensitivity) * 0.18
+          } else if (v.detectMode === 'brightness') {
+            threshold = 0.12 + (1 - v.sensitivity) * 0.65
+          } else {
+            // hybrid
+            threshold = 0.03 + (1 - v.sensitivity) * 0.25
+          }
+
+          // Compute per-cell motion / brightness energy
+          for (let y = 0; y < GH; y++) {
+            for (let x = 0; x < GW; x++) {
+              const idx = (y * GW + x) * 4
+              const bgIdx = (y * GW + x) * 3
+              const r = data[idx],
+                g = data[idx + 1],
+                b = data[idx + 2]
+              const luma = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+
+              // Motion delta against background model
+              const bgR = this.bgData[bgIdx]
+              const bgG = this.bgData[bgIdx + 1]
+              const bgB = this.bgData[bgIdx + 2]
+              const motion =
+                (Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB)) /
+                (3 * 255)
+
+              // Background model adaptation rate
+              const adaptRate = 0.035
+              this.bgData[bgIdx] += (r - bgR) * adaptRate
+              this.bgData[bgIdx + 1] += (g - bgG) * adaptRate
+              this.bgData[bgIdx + 2] += (b - bgB) * adaptRate
+
+              let val = 0
+              if (v.detectMode === 'motion') {
+                val = motion
+              } else if (v.detectMode === 'brightness') {
+                val = luma
+              } else {
+                // hybrid
+                val = Math.max(motion * 1.4, luma * 0.7)
+              }
+
+              energyGrid[y * GW + x] = val > threshold ? val : 0
+            }
+          }
+
+          // Save current frame for next difference
+          this.prevAnalysisData = currImgData
+
+          // Connected components (flood fill) clustering
+          const visited = new Uint8Array(GW * GH)
+          const rawClusters = []
+
+          for (let y = 0; y < GH; y++) {
+            for (let x = 0; x < GW; x++) {
+              const i = y * GW + x
+              if (visited[i] || energyGrid[i] === 0) continue
+
+              // BFS to find cluster
+              let minX = x,
+                maxX = x,
+                minY = y,
+                maxY = y
+              let sumX = 0,
+                sumY = 0,
+                count = 0,
+                sumEnergy = 0
+              const queue = [x, y]
+              visited[i] = 1
+
+              while (queue.length > 0) {
+                const qy = queue.pop()
+                const qx = queue.pop()
+                const qi = qy * GW + qx
+                const e = energyGrid[qi]
+
+                sumX += qx * e
+                sumY += qy * e
+                sumEnergy += e
+                count++
+
+                if (qx < minX) minX = qx
+                if (qx > maxX) maxX = qx
+                if (qy < minY) minY = qy
+                if (qy > maxY) maxY = qy
+
+                // 4-neighborhood
+                const neighbors = [
+                  [qx + 1, qy],
+                  [qx - 1, qy],
+                  [qx, qy + 1],
+                  [qx, qy - 1],
+                ]
+                for (let k = 0; k < 4; k++) {
+                  const nx = neighbors[k][0],
+                    ny = neighbors[k][1]
+                  if (nx >= 0 && nx < GW && ny >= 0 && ny < GH) {
+                    const ni = ny * GW + nx
+                    if (!visited[ni] && energyGrid[ni] > 0) {
+                      visited[ni] = 1
+                      queue.push(nx, ny)
+                    }
+                  }
+                }
+              }
+
+              // Filter out noise
+              const scaleX = W / GW
+              const scaleY = H / GH
+              const bw = (maxX - minX + 1) * scaleX
+              const bh = (maxY - minY + 1) * scaleY
+              const area = Math.max(bw, bh)
+
+              if (area >= v.minSize && count >= 3) {
+                rawClusters.push({
+                  x: minX * scaleX,
+                  y: minY * scaleY,
+                  w: bw,
+                  h: bh,
+                  cx: (sumX / sumEnergy) * scaleX,
+                  cy: (sumY / sumEnergy) * scaleY,
+                  mass: count,
+                  energy: sumEnergy / count,
+                })
+              }
+            }
+          }
+
+          // Sort by mass and limit to maxBlobs
+          rawClusters.sort((a, b) => b.mass - a.mass)
+          return rawClusters.slice(0, v.maxBlobs)
+        },
+
+        updateTrackedBlobs(rawBlobs, v, dt) {
+          const smooth = v.smoothing
+
+          // Match rawBlobs to existing trackedBlobs by centroid distance
+          const matched = new Set()
+          const updated = []
+
+          rawBlobs.forEach((raw) => {
+            let bestDist = 180
+            let bestBlob = null
+
+            this.trackedBlobs.forEach((tb) => {
+              if (matched.has(tb)) return
+              const d = Math.hypot(tb.cx - raw.cx, tb.cy - raw.cy)
+              if (d < bestDist) {
+                bestDist = d
+                bestBlob = tb
+              }
+            })
+
+            if (bestBlob) {
+              matched.add(bestBlob)
+              // Lerp bounding box
+              bestBlob.x += (raw.x - bestBlob.x) * (1 - smooth)
+              bestBlob.y += (raw.y - bestBlob.y) * (1 - smooth)
+              bestBlob.w += (raw.w - bestBlob.w) * (1 - smooth)
+              bestBlob.h += (raw.h - bestBlob.h) * (1 - smooth)
+              bestBlob.cx += (raw.cx - bestBlob.cx) * (1 - smooth)
+              bestBlob.cy += (raw.cy - bestBlob.cy) * (1 - smooth)
+              bestBlob.mass = raw.mass
+              bestBlob.life = Math.min(1, bestBlob.life + dt * 4)
+              this.syncNodes(bestBlob, v)
+              updated.push(bestBlob)
+            } else {
+              // New blob
+              const newBlob = {
+                id: Math.floor(100 + Math.random() * 900),
+                x: raw.x,
+                y: raw.y,
+                w: raw.w,
+                h: raw.h,
+                cx: raw.cx,
+                cy: raw.cy,
+                mass: raw.mass,
+                life: 0.1,
+                nodes: [],
+              }
+              this.syncNodes(newBlob, v)
+              updated.push(newBlob)
+            }
+          })
+
+          this.trackedBlobs = updated
+        },
+
+        syncNodes(blob, v) {
+          const targetCount = v.nodeCount
+          while (blob.nodes.length < targetCount) {
+            blob.nodes.push({
+              relX: (Math.random() - 0.5) * 0.85,
+              relY: (Math.random() - 0.5) * 0.85,
+              phase: Math.random() * TAU,
+              speed: 0.8 + Math.random() * 1.6,
+              shape: this.pickShape(v.nodeShape),
+              scale: 0.7 + Math.random() * 0.6,
+            })
+          }
+          if (blob.nodes.length > targetCount) {
+            blob.nodes.length = targetCount
+          }
+          // Update shape if changed
+          blob.nodes.forEach((n) => {
+            if (v.nodeShape !== 'mixed') {
+              n.shape = v.nodeShape
+            }
+          })
+        },
+
+        pickShape(shapePref) {
+          if (shapePref !== 'mixed') return shapePref
+          const shapes = [
+            'square',
+            'diamond',
+            'bracket',
+            'crosshair',
+            'circle',
+            'triangle',
+          ]
+          return shapes[Math.floor(Math.random() * shapes.length)]
+        },
+
+        renderTracking(v) {
+          const { time } = env
+
+          this.trackedBlobs.forEach((b, blobIndex) => {
+            const alpha = Math.min(1, b.life)
+            ctx.save()
+            ctx.globalAlpha = alpha
+
+            // 1. Edit Mode Bounding Box & Handles
+            if (v.showBoundingBox) {
+              ctx.strokeStyle = v.boxColor
+              ctx.lineWidth = 1
+              ctx.strokeRect(b.x, b.y, b.w, b.h)
+
+              if (v.showHandles) {
+                // Draw 8 transform handles (4 corners + 4 midpoints)
+                const handles = [
+                  [b.x, b.y],
+                  [b.x + b.w, b.y],
+                  [b.x, b.y + b.h],
+                  [b.x + b.w, b.y + b.h],
+                  [b.x + b.w / 2, b.y],
+                  [b.x + b.w / 2, b.y + b.h],
+                  [b.x, b.y + b.h / 2],
+                  [b.x + b.w, b.y + b.h / 2],
+                ]
+                const hs = 5
+                ctx.fillStyle = '#ffffff'
+                ctx.strokeStyle = v.boxColor
+                ctx.lineWidth = 1
+                handles.forEach(([hx, hy]) => {
+                  ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs)
+                  ctx.strokeRect(hx - hs / 2, hy - hs / 2, hs, hs)
+                })
+              }
+            }
+
+            // 2. CCTV Corner Brackets
+            if (v.showBrackets) {
+              const bl = Math.min(14, b.w * 0.25, b.h * 0.25)
+              ctx.strokeStyle = v.boxColor
+              ctx.lineWidth = 1.5
+
+              // Top-left
+              ctx.beginPath()
+              ctx.moveTo(b.x, b.y + bl)
+              ctx.lineTo(b.x, b.y)
+              ctx.lineTo(b.x + bl, b.y)
+              // Top-right
+              ctx.moveTo(b.x + b.w - bl, b.y)
+              ctx.lineTo(b.x + b.w, b.y)
+              ctx.lineTo(b.x + b.w, b.y + bl)
+              // Bottom-left
+              ctx.moveTo(b.x, b.y + b.h - bl)
+              ctx.lineTo(b.x, b.y + b.h)
+              ctx.lineTo(b.x + bl, b.y + b.h)
+              // Bottom-right
+              ctx.moveTo(b.x + b.w - bl, b.y + b.h)
+              ctx.lineTo(b.x + b.w, b.y + b.h)
+              ctx.lineTo(b.x + b.w, b.y + b.h - bl)
+              ctx.stroke()
+            }
+
+            // 3. Centroid Crosshair
+            if (v.showCrosshair) {
+              const cs = 7
+              ctx.strokeStyle = v.accentColor
+              ctx.lineWidth = 1
+              ctx.beginPath()
+              ctx.moveTo(b.cx - cs, b.cy)
+              ctx.lineTo(b.cx + cs, b.cy)
+              ctx.moveTo(b.cx, b.cy - cs)
+              ctx.lineTo(b.cx, b.cy + cs)
+              ctx.stroke()
+            }
+
+            // 4. Tech HUD Labels
+            if (v.showLabels) {
+              ctx.font = '9px monospace'
+              const label = `ID#${b.id} [${Math.round(b.cx)},${Math.round(b.cy)}] ${Math.round(b.w)}x${Math.round(b.h)}`
+              const tw = ctx.measureText(label).width
+              ctx.fillStyle = 'rgba(10, 12, 18, 0.75)'
+              ctx.fillRect(b.x, b.y - 14, tw + 8, 12)
+              ctx.strokeStyle = v.boxColor
+              ctx.strokeRect(b.x, b.y - 14, tw + 8, 12)
+              ctx.fillStyle = v.boxColor
+              ctx.fillText(label, b.x + 4, b.y - 5)
+            }
+
+            // Calculate animated node positions
+            const computedNodes = b.nodes.map((n) => {
+              const jit = v.jitter
+              const ox = Math.sin(time * n.speed + n.phase) * (b.w * 0.18 * jit)
+              const oy =
+                Math.cos(time * n.speed * 1.2 + n.phase) * (b.h * 0.18 * jit)
+              return {
+                x: b.cx + n.relX * b.w + ox,
+                y: b.cy + n.relY * b.h + oy,
+                shape: n.shape,
+                size: v.nodeSize * n.scale,
+              }
+            })
+
+            // 5. Connect Nodes (Mesh wireframe)
+            if (v.connectNodes && computedNodes.length > 1) {
+              ctx.save()
+              ctx.strokeStyle = v.nodeColor
+              ctx.lineWidth = 0.75
+              const maxDist = Math.max(b.w, b.h) * 0.45
+
+              for (let i = 0; i < computedNodes.length; i++) {
+                for (let j = i + 1; j < computedNodes.length; j++) {
+                  const d = Math.hypot(
+                    computedNodes[i].x - computedNodes[j].x,
+                    computedNodes[i].y - computedNodes[j].y,
+                  )
+                  if (d < maxDist) {
+                    ctx.globalAlpha = alpha * (1 - d / maxDist) * 0.4
+                    ctx.beginPath()
+                    ctx.moveTo(computedNodes[i].x, computedNodes[i].y)
+                    ctx.lineTo(computedNodes[j].x, computedNodes[j].y)
+                    ctx.stroke()
+                  }
+                }
+              }
+              ctx.restore()
+            }
+
+            // 6. Draw Scattered Nodes
+            ctx.save()
+            if (v.blendMode !== 'source-over') {
+              ctx.globalCompositeOperation = v.blendMode
+            }
+            computedNodes.forEach((cn, idx) => {
+              this.drawNodeShape(
+                cn.x,
+                cn.y,
+                cn.size,
+                cn.shape,
+                v.nodeColor,
+                v.accentColor,
+                idx,
+              )
+            })
+            ctx.restore()
+
+            ctx.restore()
+          })
+        },
+
+        drawNodeShape(x, y, s, shape, color, accentColor, idx) {
+          ctx.save()
+          ctx.translate(x, y)
+
+          if (shape === 'square') {
+            // Edit-mode square handle
+            ctx.fillStyle = color
+            ctx.fillRect(-s / 2, -s / 2, s, s)
+            ctx.strokeStyle = accentColor
+            ctx.lineWidth = 1
+            ctx.strokeRect(-s / 2, -s / 2, s, s)
+          } else if (shape === 'diamond') {
+            // Rotated vector handle
+            ctx.rotate(Math.PI / 4)
+            ctx.fillStyle = color
+            ctx.fillRect(-s / 2, -s / 2, s, s)
+            ctx.strokeStyle = accentColor
+            ctx.lineWidth = 1
+            ctx.strokeRect(-s / 2, -s / 2, s, s)
+          } else if (shape === 'bracket') {
+            // Mini framing bracket
+            ctx.strokeStyle = color
+            ctx.lineWidth = 1.5
+            const hs = s * 0.6
+            ctx.beginPath()
+            ctx.moveTo(-hs, 0)
+            ctx.lineTo(-hs, -hs)
+            ctx.lineTo(0, -hs)
+            ctx.moveTo(hs, 0)
+            ctx.lineTo(hs, hs)
+            ctx.lineTo(0, hs)
+            ctx.stroke()
+          } else if (shape === 'crosshair') {
+            // Tech reticle +
+            ctx.strokeStyle = color
+            ctx.lineWidth = 1.2
+            const hs = s * 0.6
+            ctx.beginPath()
+            ctx.moveTo(-hs, 0)
+            ctx.lineTo(hs, 0)
+            ctx.moveTo(0, -hs)
+            ctx.lineTo(0, hs)
+            ctx.stroke()
+            ctx.fillStyle = accentColor
+            ctx.fillRect(-1, -1, 2, 2)
+          } else if (shape === 'circle') {
+            // Vector node dot with ring
+            ctx.beginPath()
+            ctx.arc(0, 0, s / 2, 0, TAU)
+            ctx.strokeStyle = color
+            ctx.lineWidth = 1.2
+            ctx.stroke()
+            ctx.fillStyle = accentColor
+            ctx.beginPath()
+            ctx.arc(0, 0, s / 4, 0, TAU)
+            ctx.fill()
+          } else if (shape === 'triangle') {
+            // Directional delta
+            const hs = s * 0.6
+            ctx.beginPath()
+            ctx.moveTo(0, -hs)
+            ctx.lineTo(hs, hs * 0.8)
+            ctx.lineTo(-hs, hs * 0.8)
+            ctx.closePath()
+            ctx.fillStyle = color
+            ctx.fill()
+            ctx.strokeStyle = accentColor
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+          ctx.restore()
+        },
+      }
+
+      // ======================================================================
+      // EFFECT 3: pixel-trail
+      // Inspired by basementstudio/shader-lab Pixel Trail effect.
+      // Discretizes video/image into a pixelated mosaic grid with decaying
+      // temporal trails, chromatic aberration dispersion, and cursor interaction.
+      // ======================================================================
+      const pixelTrail = {
+        id: 'pixel-trail',
+        label: 'pixel-trail',
+        groups: [
+          {
+            title: 'Trail Dynamics',
+            controls: [
+              {
+                key: 'pixelSize',
+                label: 'Pixel block size',
+                type: 'range',
+                min: 4,
+                max: 48,
+                step: 2,
+                value: 12,
+                unit: 'px',
+              },
+              {
+                key: 'persistence',
+                label: 'Trail persistence',
+                type: 'range',
+                min: 0.5,
+                max: 0.98,
+                step: 0.01,
+                value: 0.91,
+                unit: '',
+              },
+              {
+                key: 'motionSensitivity',
+                label: 'Motion sensitivity',
+                type: 'range',
+                min: 0.05,
+                max: 0.95,
+                step: 0.01,
+                value: 0.45,
+                unit: '',
+              },
+            ],
+          },
+          {
+            title: 'Color & Aesthetics',
+            controls: [
+              {
+                key: 'colorMode',
+                label: 'Trail color palette',
+                type: 'select',
+                options: [
+                  'chromatic',
+                  'original',
+                  'thermal',
+                  'phosphor',
+                  'tint',
+                ],
+                value: 'chromatic',
+              },
+              {
+                key: 'trailColor',
+                label: 'Tint color (for tint mode)',
+                type: 'color',
+                value: '#00ff88',
+              },
+              {
+                key: 'blendMode',
+                label: 'Trail blend mode',
+                type: 'select',
+                options: ['screen', 'lighter', 'source-over'],
+                value: 'screen',
+              },
+              {
+                key: 'glowIntensity',
+                label: 'Glow intensity',
+                type: 'range',
+                min: 0.5,
+                max: 2.5,
+                step: 0.1,
+                value: 1.3,
+                unit: 'x',
+              },
+            ],
+          },
+          {
+            title: 'Physics & Drift',
+            controls: [
+              {
+                key: 'driftDirection',
+                label: 'Trail drift',
+                type: 'select',
+                options: [
+                  'none',
+                  'down (drip)',
+                  'up (float)',
+                  'wind-right',
+                  'scatter',
+                ],
+                value: 'none',
+              },
+              {
+                key: 'driftSpeed',
+                label: 'Drift velocity',
+                type: 'range',
+                min: 0,
+                max: 6,
+                step: 0.5,
+                value: 1.5,
+                unit: 'px',
+              },
+            ],
+          },
+          {
+            title: 'Display & Base',
+            controls: [
+              {
+                key: 'backgroundDim',
+                label: 'Background dim',
+                type: 'range',
+                min: 0,
+                max: 0.95,
+                step: 0.05,
+                value: 0.35,
+                unit: '',
+              },
+              {
+                key: 'showGrid',
+                label: 'Pixel grid lines',
+                type: 'checkbox',
+                value: false,
+              },
+              {
+                key: 'gridColor',
+                label: 'Grid color',
+                type: 'color',
+                value: '#151722',
+              },
+            ],
+          },
+        ],
+
+        // Trail grid buffers
+        gridW: 0,
+        gridH: 0,
+        cellSize: 0,
+        trailR: null,
+        trailG: null,
+        trailB: null,
+        trailLife: null,
+        prevR: null,
+        prevG: null,
+        prevB: null,
+        downCanvas: document.createElement('canvas'),
+        downCtx: null,
+
+        initGrid(cols, rows, sz) {
+          this.gridW = cols
+          this.gridH = rows
+          this.cellSize = sz
+          const total = cols * rows
+          this.trailR = new Float32Array(total)
+          this.trailG = new Float32Array(total)
+          this.trailB = new Float32Array(total)
+          this.trailLife = new Float32Array(total)
+          this.prevR = new Uint8Array(total)
+          this.prevG = new Uint8Array(total)
+          this.prevB = new Uint8Array(total)
+          this.downCanvas.width = cols
+          this.downCanvas.height = rows
+          this.downCtx = this.downCanvas.getContext('2d', {
+            willReadFrequently: true,
+          })
+        },
+
+        draw(v, dt) {
+          const { W, H, cursor } = env
+          env.time += dt
+
+          const sz = Math.max(4, Math.floor(v.pixelSize))
+          const cols = Math.ceil(W / sz)
+          const rows = Math.ceil(H / sz)
+
+          if (
+            this.gridW !== cols ||
+            this.gridH !== rows ||
+            this.cellSize !== sz ||
+            !this.downCtx
+          ) {
+            this.initGrid(cols, rows, sz)
+          }
+
+          // Sample downsampled source frame
+          this.downCtx.drawImage(env.sourceCanvas, 0, 0, cols, rows)
+          const imgData = this.downCtx.getImageData(0, 0, cols, rows)
+          const data = imgData.data
+
+          const motionThreshold = Math.max(
+            0.02,
+            (1 - v.motionSensitivity) * 0.22,
+          )
+          const persistence = v.persistence
+          const glow = v.glowIntensity
+
+          let activeCount = 0
+
+          // 1. Process cells: detect motion triggers and decay unactivated cells
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const idx = y * cols + x
+              const pIdx = idx * 4
+
+              const r = data[pIdx]
+              const g = data[pIdx + 1]
+              const b = data[pIdx + 2]
+
+              // Motion delta
+              const pr = this.prevR[idx]
+              const pg = this.prevG[idx]
+              const pb = this.prevB[idx]
+              const motion =
+                (Math.abs(r - pr) + Math.abs(g - pg) + Math.abs(b - pb)) /
+                (3 * 255)
+
+              // Update previous frame
+              this.prevR[idx] = r
+              this.prevG[idx] = g
+              this.prevB[idx] = b
+
+              // Motion trigger
+              if (motion > motionThreshold) {
+                this.trailLife[idx] = 1.0
+                this.trailR[idx] = r
+                this.trailG[idx] = g
+                this.trailB[idx] = b
+              } else {
+                this.trailLife[idx] *= persistence
+              }
+
+              if (this.trailLife[idx] > 0.02) activeCount++
+            }
+          }
+
+          // 2. Physics & Drift (optional dispersal)
+          if (v.driftDirection !== 'none' && v.driftSpeed > 0) {
+            this.applyDrift(cols, rows, v.driftDirection, v.driftSpeed * 0.15)
+          }
+
+          // 3. Render
+          ctx.fillStyle = '#0a0b10'
+          ctx.fillRect(0, 0, W, H)
+
+          // Draw underlying video/image with dimming
+          if (v.backgroundDim < 1) {
+            ctx.save()
+            ctx.globalAlpha = 1 - v.backgroundDim
+            ctx.drawImage(env.sourceCanvas, 0, 0, W, H)
+            ctx.restore()
+          }
+
+          // Draw trailing pixel blocks
+          ctx.save()
+          if (v.blendMode !== 'source-over') {
+            ctx.globalCompositeOperation = v.blendMode
+          }
+
+          const mode = v.colorMode
+          const showGrid = v.showGrid
+          const gridColor = v.gridColor
+
+          // Parse tint color once if tint mode
+          let tintR = 0,
+            tintG = 255,
+            tintB = 136
+          if (mode === 'tint') {
+            const hex = v.trailColor.replace('#', '')
+            tintR = parseInt(hex.substring(0, 2), 16) || 0
+            tintG = parseInt(hex.substring(2, 4), 16) || 255
+            tintB = parseInt(hex.substring(4, 6), 16) || 136
+          }
+
+          for (let y = 0; y < rows; y++) {
+            const py = y * sz
+            for (let x = 0; x < cols; x++) {
+              const idx = y * cols + x
+              const life = this.trailLife[idx]
+              if (life <= 0.02) continue
+
+              const px = x * sz
+              let cr = 0,
+                cg = 0,
+                cb = 0,
+                alpha = life
+
+              if (mode === 'original') {
+                cr = this.trailR[idx] * glow
+                cg = this.trailG[idx] * glow
+                cb = this.trailB[idx] * glow
+              } else if (mode === 'chromatic') {
+                // Signature chromatic aberration: R, G, B decay at different rates
+                const rLife = life
+                const gLife = Math.pow(life, 1.25)
+                const bLife = Math.pow(life, 1.6)
+                cr = this.trailR[idx] * rLife * glow
+                cg = this.trailG[idx] * gLife * glow
+                cb = this.trailB[idx] * bLife * glow
+              } else if (mode === 'phosphor') {
+                // Cyberpunk CRT phosphor glow (green/amber)
+                cr = 20 * life
+                cg = 255 * Math.min(1, life * 1.3) * glow
+                cb = 140 * Math.pow(life, 2) * glow
+              } else if (mode === 'thermal') {
+                // Heat map spectrum based on trail age/life
+                const [tr, tg, tb] = this.thermalColor(life)
+                cr = tr * glow
+                cg = tg * glow
+                cb = tb * glow
+              } else if (mode === 'tint') {
+                cr = tintR * life * glow
+                cg = tintG * life * glow
+                cb = tintB * life * glow
+              }
+
+              ctx.fillStyle = `rgb(${Math.min(255, cr | 0)}, ${Math.min(255, cg | 0)}, ${Math.min(255, cb | 0)})`
+              ctx.globalAlpha = Math.min(1, alpha)
+
+              if (showGrid && sz > 4) {
+                ctx.fillRect(px + 0.5, py + 0.5, sz - 1, sz - 1)
+              } else {
+                ctx.fillRect(px, py, sz, sz)
+              }
+            }
+          }
+
+          // Optional grid lines
+          if (showGrid) {
+            ctx.globalCompositeOperation = 'source-over'
+            ctx.globalAlpha = 0.35
+            ctx.strokeStyle = gridColor
+            ctx.lineWidth = 0.5
+            ctx.beginPath()
+            for (let x = 0; x <= W; x += sz) {
+              ctx.moveTo(x + 0.5, 0)
+              ctx.lineTo(x + 0.5, H)
+            }
+            for (let y = 0; y <= H; y += sz) {
+              ctx.moveTo(0, y + 0.5)
+              ctx.lineTo(W, y + 0.5)
+            }
+            ctx.stroke()
+          }
+
+          ctx.restore()
+
+          return `${activeCount.toLocaleString()} active trail blocks · ${sz}px grid`
+        },
+
+        thermalColor(t) {
+          let r = 0,
+            g = 0,
+            b = 0
+          if (t < 0.25) {
+            b = Math.floor(t * 4 * 255)
+          } else if (t < 0.5) {
+            r = Math.floor((t - 0.25) * 4 * 255)
+            b = 255
+          } else if (t < 0.75) {
+            r = 255
+            g = Math.floor((t - 0.5) * 4 * 200)
+            b = Math.floor((1 - (t - 0.5) * 4) * 255)
+          } else {
+            r = 255
+            g = Math.floor(200 + (t - 0.75) * 4 * 55)
+            b = Math.floor((t - 0.75) * 4 * 255)
+          }
+          return [r, g, b]
+        },
+
+        applyDrift(cols, rows, dir, rate) {
+          const shiftChance = Math.min(0.6, rate)
+          if (dir === 'down (drip)') {
+            for (let y = rows - 2; y >= 0; y--) {
+              for (let x = 0; x < cols; x++) {
+                const i = y * cols + x
+                const down = (y + 1) * cols + x
+                if (this.trailLife[i] > 0.05 && Math.random() < shiftChance) {
+                  this.trailLife[down] = Math.max(
+                    this.trailLife[down],
+                    this.trailLife[i] * 0.95,
+                  )
+                  this.trailR[down] = this.trailR[i]
+                  this.trailG[down] = this.trailG[i]
+                  this.trailB[down] = this.trailB[i]
+                }
+              }
+            }
+          } else if (dir === 'up (float)') {
+            for (let y = 1; y < rows; y++) {
+              for (let x = 0; x < cols; x++) {
+                const i = y * cols + x
+                const up = (y - 1) * cols + x
+                if (this.trailLife[i] > 0.05 && Math.random() < shiftChance) {
+                  this.trailLife[up] = Math.max(
+                    this.trailLife[up],
+                    this.trailLife[i] * 0.95,
+                  )
+                  this.trailR[up] = this.trailR[i]
+                  this.trailG[up] = this.trailG[i]
+                  this.trailB[up] = this.trailB[i]
+                }
+              }
+            }
+          } else if (dir === 'wind-right') {
+            for (let y = 0; y < rows; y++) {
+              for (let x = cols - 2; x >= 0; x--) {
+                const i = y * cols + x
+                const right = y * cols + (x + 1)
+                if (this.trailLife[i] > 0.05 && Math.random() < shiftChance) {
+                  this.trailLife[right] = Math.max(
+                    this.trailLife[right],
+                    this.trailLife[i] * 0.95,
+                  )
+                  this.trailR[right] = this.trailR[i]
+                  this.trailG[right] = this.trailG[i]
+                  this.trailB[right] = this.trailB[i]
+                }
+              }
+            }
+          } else if (dir === 'scatter') {
+            for (let y = 1; y < rows - 1; y++) {
+              for (let x = 1; x < cols - 1; x++) {
+                const i = y * cols + x
+                if (
+                  this.trailLife[i] > 0.1 &&
+                  Math.random() < shiftChance * 0.3
+                ) {
+                  const ox = Math.random() > 0.5 ? 1 : -1
+                  const oy = Math.random() > 0.5 ? 1 : -1
+                  const ni = (y + oy) * cols + (x + ox)
+                  this.trailLife[ni] = Math.max(
+                    this.trailLife[ni],
+                    this.trailLife[i] * 0.9,
+                  )
+                }
+              }
+            }
+          }
+        },
+      }
+
+      // ======================================================================
+      // EFFECT 4: finger-sketch
+      // Inspired by shader-effects-inc/shaders interactive web shaders.
+      // Pure, high-performance finger & stylus sketching canvas for drawing
+      // and handwriting text directly by hand, with shader-like brush styles,
+      // velocity-sensitive stroke weight, and one-click/shortcut clearing.
+      // ======================================================================
+      const fingerSketch = {
+        id: 'finger-sketch',
+        label: 'finger-sketch',
+        groups: [
+          {
+            title: 'Brush & Stroke',
+            controls: [
+              {
+                key: 'brushStyle',
+                label: 'Brush style',
+                type: 'select',
+                options: [
+                  'neon-glow',
+                  'chalk',
+                  'ink-pen',
+                  'frosted-wipe',
+                  'soft-spray',
+                ],
+                value: 'neon-glow',
+              },
+              {
+                key: 'brushColor',
+                label: 'Brush color',
+                type: 'color',
+                value: '#00ff88',
+              },
+              {
+                key: 'brushSize',
+                label: 'Brush thickness',
+                type: 'range',
+                min: 2,
+                max: 80,
+                step: 1,
+                value: 18,
+                unit: 'px',
+              },
+              {
+                key: 'glowIntensity',
+                label: 'Glow intensity',
+                type: 'range',
+                min: 0,
+                max: 50,
+                step: 1,
+                value: 20,
+                unit: 'px',
+              },
+              {
+                key: 'pressureSens',
+                label: 'Handwriting dynamics',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.05,
+                value: 0.65,
+                unit: '',
+              },
+              {
+                key: 'smoothing',
+                label: 'Stroke smoothing',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.05,
+                value: 0.75,
+                unit: '',
+              },
+            ],
+          },
+          {
+            title: 'Canvas & Background',
+            controls: [
+              {
+                key: 'background',
+                label: 'Background canvas',
+                type: 'select',
+                options: [
+                  'media-source',
+                  'chalkboard',
+                  'dark-canvas',
+                  'pure-black',
+                  'pure-white',
+                ],
+                value: 'media-source',
+              },
+              {
+                key: 'fadeRate',
+                label: 'Vapor fade rate (0 = permanent)',
+                type: 'range',
+                min: 0,
+                max: 0.2,
+                step: 0.005,
+                value: 0,
+                unit: '',
+              },
+              {
+                key: 'clearBtn',
+                label: '🧹 Clear Canvas',
+                type: 'button',
+                onClick: () => fingerSketch.clear(),
+              },
+              {
+                key: 'exportBtn',
+                label: '💾 Export Canvas PNG',
+                type: 'button',
+                onClick: () => fingerSketch.exportPng(),
+              },
+            ],
+          },
+        ],
+
+        // Internal sketch canvas buffer & state
+        sketchCanvas: null,
+        sketchCtx: null,
+        currentStroke: null,
+        lastPoint: null,
+        lastMidX: null,
+        lastMidY: null,
+        lastTime: 0,
+        totalStrokes: 0,
+
+        ensureCanvas() {
+          const { W, H } = env
+          if (!W || !H) return
+
+          if (!this.sketchCanvas) {
+            this.sketchCanvas = document.createElement('canvas')
+            this.sketchCtx = this.sketchCanvas.getContext('2d')
+            this.sketchCanvas.width = W
+            this.sketchCanvas.height = H
+          } else if (
+            this.sketchCanvas.width !== W ||
+            this.sketchCanvas.height !== H
+          ) {
+            const old = document.createElement('canvas')
+            old.width = this.sketchCanvas.width
+            old.height = this.sketchCanvas.height
+            old.getContext('2d').drawImage(this.sketchCanvas, 0, 0)
+
+            this.sketchCanvas.width = W
+            this.sketchCanvas.height = H
+            this.sketchCtx.drawImage(old, 0, 0, W, H)
+          }
+        },
+
+        clear() {
+          if (this.sketchCanvas && this.sketchCtx) {
+            this.sketchCtx.clearRect(
+              0,
+              0,
+              this.sketchCanvas.width,
+              this.sketchCanvas.height,
+            )
+          }
+          this.currentStroke = null
+          this.lastPoint = null
+          this.lastMidX = null
+          this.lastMidY = null
+          this.totalStrokes = 0
+        },
+
+        exportPng() {
+          this.ensureCanvas()
+          const a = document.createElement('a')
+          a.download = `finger-sketch-${Date.now()}.png`
+          a.href = this.sketchCanvas.toDataURL('image/png')
+          a.click()
+        },
+
+        onPointerDown(x, y) {
+          this.ensureCanvas()
+          const now = performance.now()
+          this.lastPoint = { x, y }
+          this.lastMidX = x
+          this.lastMidY = y
+          this.lastTime = now
+          this.currentStroke = [{ x, y, time: now, speed: 0 }]
+          this.totalStrokes++
+
+          const v = values[this.id]
+          this.drawBrushSegment(x, y, x, y, v.brushSize, v)
+        },
+
+        onPointerMove(x, y, isDown) {
+          if (!isDown || !this.lastPoint) return
+          this.ensureCanvas()
+
+          const now = performance.now()
+          const dx = x - this.lastPoint.x
+          const dy = y - this.lastPoint.y
+          const dist = Math.hypot(dx, dy)
+          if (dist < 1.2) return
+
+          const dt = Math.max(0.001, (now - this.lastTime) / 1000)
+          const speed = dist / dt
+          this.lastTime = now
+
+          const v = values[this.id]
+          const sens = v.pressureSens
+          // Pen velocity dynamics: smooth taper for handwriting & sketching
+          const speedFactor = Math.max(
+            0.3,
+            Math.min(1.8, 1.35 - (speed / 1100) * sens),
+          )
+          const currentWidth = Math.max(2, v.brushSize * speedFactor)
+
+          this.currentStroke.push({ x, y, time: now, speed })
+
+          if (this.currentStroke.length >= 3) {
+            const len = this.currentStroke.length
+            const p0 = this.currentStroke[len - 2]
+            const p1 = this.currentStroke[len - 1]
+            const midX = (p0.x + p1.x) / 2
+            const midY = (p0.y + p1.y) / 2
+            this.drawSmoothCurve(
+              this.lastMidX ?? p0.x,
+              this.lastMidY ?? p0.y,
+              p0.x,
+              p0.y,
+              midX,
+              midY,
+              currentWidth,
+              v,
+            )
+            this.lastMidX = midX
+            this.lastMidY = midY
+          } else {
+            this.drawBrushSegment(
+              this.lastPoint.x,
+              this.lastPoint.y,
+              x,
+              y,
+              currentWidth,
+              v,
+            )
+            this.lastMidX = (this.lastPoint.x + x) / 2
+            this.lastMidY = (this.lastPoint.y + y) / 2
+          }
+
+          this.lastPoint = { x, y }
+        },
+
+        onPointerUp() {
+          this.lastPoint = null
+          this.lastMidX = null
+          this.lastMidY = null
+          this.currentStroke = null
+        },
+
+        drawBrushSegment(x1, y1, x2, y2, width, v) {
+          const sCtx = this.sketchCtx
+          sCtx.save()
+          sCtx.lineCap = 'round'
+          sCtx.lineJoin = 'round'
+
+          if (v.brushStyle === 'neon-glow') {
+            const glow = v.glowIntensity
+            sCtx.shadowColor = v.brushColor
+            sCtx.shadowBlur = glow
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.75
+            sCtx.beginPath()
+            sCtx.moveTo(x1, y1)
+            sCtx.lineTo(x2, y2)
+            sCtx.stroke()
+
+            // Hot luminous core
+            sCtx.shadowBlur = 0
+            sCtx.strokeStyle = '#ffffff'
+            sCtx.lineWidth = Math.max(1.5, width * 0.28)
+            sCtx.globalAlpha = 0.95
+            sCtx.stroke()
+          } else if (v.brushStyle === 'chalk') {
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.72
+            sCtx.beginPath()
+            sCtx.moveTo(x1, y1)
+            sCtx.lineTo(x2, y2)
+            sCtx.stroke()
+
+            // Realistic chalk dust speckles
+            const dist = Math.hypot(x2 - x1, y2 - y1)
+            const count = Math.max(2, Math.floor(dist / 2.5))
+            sCtx.fillStyle = v.brushColor
+            for (let k = 0; k < count; k++) {
+              const t = Math.random()
+              const px =
+                x1 + (x2 - x1) * t + (Math.random() - 0.5) * width * 0.85
+              const py =
+                y1 + (y2 - y1) * t + (Math.random() - 0.5) * width * 0.85
+              const r = Math.random() * 1.5 + 0.4
+              sCtx.globalAlpha = Math.random() * 0.55 + 0.25
+              sCtx.beginPath()
+              sCtx.arc(px, py, r, 0, TAU)
+              sCtx.fill()
+            }
+          } else if (v.brushStyle === 'ink-pen') {
+            // Calligraphy fountain pen for clean handwriting
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.95
+            sCtx.beginPath()
+            sCtx.moveTo(x1, y1)
+            sCtx.lineTo(x2, y2)
+            sCtx.stroke()
+          } else if (v.brushStyle === 'frosted-wipe') {
+            // Translucent glass wiper
+            sCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
+            sCtx.lineWidth = width
+            sCtx.shadowColor = 'rgba(255, 255, 255, 0.4)'
+            sCtx.shadowBlur = width * 0.4
+            sCtx.beginPath()
+            sCtx.moveTo(x1, y1)
+            sCtx.lineTo(x2, y2)
+            sCtx.stroke()
+
+            const dist = Math.hypot(x2 - x1, y2 - y1)
+            const beads = Math.max(1, Math.floor(dist / 6))
+            sCtx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+            for (let k = 0; k < beads; k++) {
+              const side = Math.random() > 0.5 ? 1 : -1
+              const t = Math.random()
+              const nx = -(y2 - y1) / (dist || 1)
+              const ny = (x2 - x1) / (dist || 1)
+              const px = x1 + (x2 - x1) * t + nx * (width * 0.5 * side)
+              const py = y1 + (y2 - y1) * t + ny * (width * 0.5 * side)
+              sCtx.beginPath()
+              sCtx.arc(px, py, Math.random() * 1.8 + 0.8, 0, TAU)
+              sCtx.fill()
+            }
+          } else {
+            // soft-spray
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.shadowColor = v.brushColor
+            sCtx.shadowBlur = width * 0.6
+            sCtx.globalAlpha = 0.55
+            sCtx.beginPath()
+            sCtx.moveTo(x1, y1)
+            sCtx.lineTo(x2, y2)
+            sCtx.stroke()
+          }
+
+          sCtx.restore()
+        },
+
+        drawSmoothCurve(startX, startY, ctrlX, ctrlY, endX, endY, width, v) {
+          const sCtx = this.sketchCtx
+          sCtx.save()
+          sCtx.lineCap = 'round'
+          sCtx.lineJoin = 'round'
+
+          if (v.brushStyle === 'neon-glow') {
+            const glow = v.glowIntensity
+            sCtx.shadowColor = v.brushColor
+            sCtx.shadowBlur = glow
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.75
+            sCtx.beginPath()
+            sCtx.moveTo(startX, startY)
+            sCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY)
+            sCtx.stroke()
+
+            sCtx.shadowBlur = 0
+            sCtx.strokeStyle = '#ffffff'
+            sCtx.lineWidth = Math.max(1.5, width * 0.28)
+            sCtx.globalAlpha = 0.95
+            sCtx.stroke()
+          } else if (v.brushStyle === 'chalk') {
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.72
+            sCtx.beginPath()
+            sCtx.moveTo(startX, startY)
+            sCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY)
+            sCtx.stroke()
+
+            const dist = Math.hypot(endX - startX, endY - startY)
+            const count = Math.max(2, Math.floor(dist / 2.5))
+            sCtx.fillStyle = v.brushColor
+            for (let k = 0; k < count; k++) {
+              const t = Math.random()
+              const invT = 1 - t
+              const px =
+                invT * invT * startX +
+                2 * invT * t * ctrlX +
+                t * t * endX +
+                (Math.random() - 0.5) * width * 0.85
+              const py =
+                invT * invT * startY +
+                2 * invT * t * ctrlY +
+                t * t * endY +
+                (Math.random() - 0.5) * width * 0.85
+              const r = Math.random() * 1.5 + 0.4
+              sCtx.globalAlpha = Math.random() * 0.55 + 0.25
+              sCtx.beginPath()
+              sCtx.arc(px, py, r, 0, TAU)
+              sCtx.fill()
+            }
+          } else if (v.brushStyle === 'ink-pen') {
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.globalAlpha = 0.95
+            sCtx.beginPath()
+            sCtx.moveTo(startX, startY)
+            sCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY)
+            sCtx.stroke()
+          } else if (v.brushStyle === 'frosted-wipe') {
+            sCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
+            sCtx.lineWidth = width
+            sCtx.shadowColor = 'rgba(255, 255, 255, 0.4)'
+            sCtx.shadowBlur = width * 0.4
+            sCtx.beginPath()
+            sCtx.moveTo(startX, startY)
+            sCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY)
+            sCtx.stroke()
+          } else {
+            // soft-spray
+            sCtx.strokeStyle = v.brushColor
+            sCtx.lineWidth = width
+            sCtx.shadowColor = v.brushColor
+            sCtx.shadowBlur = width * 0.6
+            sCtx.globalAlpha = 0.55
+            sCtx.beginPath()
+            sCtx.moveTo(startX, startY)
+            sCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY)
+            sCtx.stroke()
+          }
+
+          sCtx.restore()
+        },
+
+        drawChalkboardBg(c, W, H) {
+          const grad = c.createRadialGradient(
+            W / 2,
+            H / 2,
+            50,
+            W / 2,
+            H / 2,
+            Math.max(W, H) * 0.7,
+          )
+          grad.addColorStop(0, '#151d18')
+          grad.addColorStop(1, '#0b0f0c')
+          c.fillStyle = grad
+          c.fillRect(0, 0, W, H)
+
+          c.strokeStyle = 'rgba(255, 255, 255, 0.02)'
+          c.lineWidth = 24
+          c.beginPath()
+          c.moveTo(W * 0.1, H * 0.2)
+          c.lineTo(W * 0.9, H * 0.25)
+          c.moveTo(W * 0.15, H * 0.5)
+          c.lineTo(W * 0.85, H * 0.55)
+          c.moveTo(W * 0.05, H * 0.8)
+          c.lineTo(W * 0.95, H * 0.78)
+          c.stroke()
+        },
+
+        drawDarkCanvasBg(c, W, H) {
+          const grad = c.createLinearGradient(0, 0, 0, H)
+          grad.addColorStop(0, '#0d1017')
+          grad.addColorStop(0.5, '#121622')
+          grad.addColorStop(1, '#090c12')
+          c.fillStyle = grad
+          c.fillRect(0, 0, W, H)
+
+          // Subtle blueprint grid
+          c.strokeStyle = 'rgba(255, 255, 255, 0.025)'
+          c.lineWidth = 1
+          const sz = 40
+          c.beginPath()
+          for (let x = 0; x < W; x += sz) {
+            c.moveTo(x, 0)
+            c.lineTo(x, H)
+          }
+          for (let y = 0; y < H; y += sz) {
+            c.moveTo(0, y)
+            c.lineTo(W, y)
+          }
+          c.stroke()
+        },
+
+        draw(v, dt) {
+          const { W, H } = env
+          this.ensureCanvas()
+
+          // Vapor fade decay if enabled
+          if (v.fadeRate > 0) {
+            this.sketchCtx.save()
+            this.sketchCtx.globalCompositeOperation = 'destination-out'
+            this.sketchCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(1, v.fadeRate * dt * 8)})`
+            this.sketchCtx.fillRect(0, 0, W, H)
+            this.sketchCtx.restore()
+          }
+
+          // Background
+          if (v.background === 'media-source') {
+            ctx.drawImage(env.sourceCanvas, 0, 0, W, H)
+          } else if (v.background === 'chalkboard') {
+            this.drawChalkboardBg(ctx, W, H)
+          } else if (v.background === 'dark-canvas') {
+            this.drawDarkCanvasBg(ctx, W, H)
+          } else if (v.background === 'pure-white') {
+            ctx.fillStyle = '#ffffff'
+            ctx.fillRect(0, 0, W, H)
+          } else {
+            ctx.fillStyle = '#06070a'
+            ctx.fillRect(0, 0, W, H)
+          }
+
+          // Draw sketch canvas
+          ctx.save()
+          if (v.brushStyle === 'neon-glow') {
+            ctx.drawImage(this.sketchCanvas, 0, 0)
+            ctx.globalCompositeOperation = 'screen'
+            ctx.globalAlpha = 0.35
+            ctx.drawImage(this.sketchCanvas, 0, 0)
+          } else {
+            ctx.drawImage(this.sketchCanvas, 0, 0)
+          }
+          ctx.restore()
+
+          return `${this.totalStrokes} strokes · Canvas ${W}×${H} · ${v.brushStyle}`
+        },
+      }
+
+      // ======================================================================
+      // EFFECT 5: pixel-beams (Dither Wave)
+      // Inspired by Shaders.com "Pixel Beams" & "Dither Wave" and
+      // basementstudio/shader-lab WebGPU retro compositing presets.
+      // Turns any image, video, webcam, or generative motion input into
+      // undulating, retro-dithered light beams, wavefields, and CRT phosphor rays.
+      // ======================================================================
+      const BAYER2_DATA = [0 / 4, 2 / 4, 3 / 4, 1 / 4]
+
+      const BAYER4_DATA = [
+        0 / 16,
+        8 / 16,
+        2 / 16,
+        10 / 16,
+        12 / 16,
+        4 / 16,
+        14 / 16,
+        6 / 16,
+        3 / 16,
+        11 / 16,
+        1 / 16,
+        9 / 16,
+        15 / 16,
+        7 / 16,
+        13 / 16,
+        5 / 16,
+      ]
+
+      const BAYER8_DATA = new Float32Array([
+        0 / 64,
+        32 / 64,
+        8 / 64,
+        40 / 64,
+        2 / 64,
+        34 / 64,
+        10 / 64,
+        42 / 64,
+        48 / 64,
+        16 / 64,
+        56 / 64,
+        24 / 64,
+        50 / 64,
+        18 / 64,
+        58 / 64,
+        26 / 64,
+        12 / 64,
+        44 / 64,
+        4 / 64,
+        36 / 64,
+        14 / 64,
+        46 / 64,
+        6 / 64,
+        38 / 64,
+        60 / 64,
+        28 / 64,
+        52 / 64,
+        20 / 64,
+        62 / 64,
+        30 / 64,
+        54 / 64,
+        22 / 64,
+        3 / 64,
+        35 / 64,
+        11 / 64,
+        43 / 64,
+        1 / 64,
+        33 / 64,
+        9 / 64,
+        41 / 64,
+        51 / 64,
+        19 / 64,
+        59 / 64,
+        27 / 64,
+        49 / 64,
+        17 / 64,
+        57 / 64,
+        25 / 64,
+        15 / 64,
+        47 / 64,
+        7 / 64,
+        39 / 64,
+        13 / 64,
+        45 / 64,
+        5 / 64,
+        37 / 64,
+        63 / 64,
+        31 / 64,
+        55 / 64,
+        23 / 64,
+        61 / 64,
+        29 / 64,
+        53 / 64,
+        21 / 64,
+      ])
+
+      const CLUSTERED4_DATA = [
+        12 / 16,
+        5 / 16,
+        6 / 16,
+        13 / 16,
+        4 / 16,
+        0 / 16,
+        1 / 16,
+        7 / 16,
+        11 / 16,
+        3 / 16,
+        2 / 16,
+        8 / 16,
+        15 / 16,
+        10 / 16,
+        9 / 16,
+        14 / 16,
+      ]
+
+      function parseHexColor(hex) {
+        if (!hex) return [0, 0, 0]
+        let c = hex.replace('#', '')
+        if (c.length === 3)
+          c = c
+            .split('')
+            .map((ch) => ch + ch)
+            .join('')
+        const num = parseInt(c, 16)
+        return isNaN(num)
+          ? [0, 0, 0]
+          : [(num >> 16) & 255, (num >> 8) & 255, num & 255]
+      }
+
+      function packRgba32(r, g, b, a = 255) {
+        return (
+          ((a & 255) << 24) | ((b & 255) << 16) | ((g & 255) << 8) | (r & 255)
+        )
+      }
+
+      function hashNoise(x, y) {
+        const n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453
+        return n - Math.floor(n)
+      }
+
+      const pixelBeams = {
+        id: 'pixel-beams',
+        label: 'pixel-beams',
+        groups: [
+          {
+            title: 'Presets & Style',
+            controls: [
+              {
+                key: 'presetStyle',
+                label: 'Style preset',
+                type: 'select',
+                options: [
+                  'Dither Wave Cyan (Shaders.com)',
+                  'Laser Beams Green (CRT Matrix)',
+                  'Amber Horizon (Terminal Wave)',
+                  'Solar Flare (Heatwave Beams)',
+                  'GameBoy 4-Tone (Retro Lo-Fi)',
+                  'Cyberpunk Neon (Dual Chromatic)',
+                  'Source Color Rainbow Dither',
+                ],
+                value: 'Dither Wave Cyan (Shaders.com)',
+                onChange: (val) => pixelBeams.applyPreset(val),
+              },
+              {
+                key: 'colorPalette',
+                label: 'Color palette',
+                type: 'select',
+                options: [
+                  'neon-cyan',
+                  'cyber-green',
+                  'amber-crt',
+                  'gameboy',
+                  'sunset',
+                  'source-rgb',
+                  'monochrome',
+                  'custom',
+                ],
+                value: 'neon-cyan',
+              },
+              {
+                key: 'colorA',
+                label: 'Shadow color (A)',
+                type: 'color',
+                value: '#060919',
+              },
+              {
+                key: 'colorB',
+                label: 'Beam color (B)',
+                type: 'color',
+                value: '#00f2ff',
+              },
+            ],
+          },
+          {
+            title: 'Pixel Beams Engine',
+            controls: [
+              {
+                key: 'beamDirection',
+                label: 'Beam direction',
+                type: 'select',
+                options: [
+                  'down',
+                  'up',
+                  'horizontal',
+                  'diagonal-down',
+                  'radial-out',
+                ],
+                value: 'down',
+              },
+              {
+                key: 'beamLength',
+                label: 'Beam extrusion length',
+                type: 'range',
+                min: 0,
+                max: 80,
+                step: 1,
+                value: 36,
+                unit: 'px',
+              },
+              {
+                key: 'beamIntensity',
+                label: 'Beam intensity',
+                type: 'range',
+                min: 0,
+                max: 3,
+                step: 0.05,
+                value: 1.35,
+                unit: 'x',
+              },
+              {
+                key: 'beamDecay',
+                label: 'Beam falloff decay',
+                type: 'range',
+                min: 0.5,
+                max: 0.98,
+                step: 0.01,
+                value: 0.88,
+                unit: '',
+              },
+            ],
+          },
+          {
+            title: 'Dither Wave Dynamics',
+            controls: [
+              {
+                key: 'waveSpeed',
+                label: 'Wave speed',
+                type: 'range',
+                min: 0,
+                max: 4,
+                step: 0.1,
+                value: 1.4,
+                unit: 'x',
+              },
+              {
+                key: 'waveFrequency',
+                label: 'Wave frequency',
+                type: 'range',
+                min: 0.5,
+                max: 8,
+                step: 0.1,
+                value: 2.8,
+                unit: '',
+              },
+              {
+                key: 'waveAmplitude',
+                label: 'Wave amplitude / warp',
+                type: 'range',
+                min: 0,
+                max: 1.5,
+                step: 0.05,
+                value: 0.45,
+                unit: '',
+              },
+              {
+                key: 'wavePattern',
+                label: 'Wave type',
+                type: 'select',
+                options: [
+                  'ocean-swell',
+                  'harmonic-sine',
+                  'diagonal-flow',
+                  'radial-pulse',
+                  'glitch-steps',
+                ],
+                value: 'ocean-swell',
+              },
+              {
+                key: 'interactiveRipple',
+                label: 'Cursor wave ripple',
+                type: 'range',
+                min: 0,
+                max: 2,
+                step: 0.1,
+                value: 1.0,
+                unit: 'x',
+              },
+            ],
+          },
+          {
+            title: 'Dithering & Pixel Grid',
+            controls: [
+              {
+                key: 'pixelSize',
+                label: 'Pixel size',
+                type: 'range',
+                min: 2,
+                max: 20,
+                step: 1,
+                value: 4,
+                unit: 'px',
+              },
+              {
+                key: 'ditherPattern',
+                label: 'Dither pattern',
+                type: 'select',
+                options: [
+                  'bayer4',
+                  'bayer8',
+                  'bayer2',
+                  'clustered-dot',
+                  'blue-noise',
+                  'threshold-only',
+                ],
+                value: 'bayer4',
+              },
+              {
+                key: 'ditherLevels',
+                label: 'Quantize levels',
+                type: 'select',
+                options: [
+                  '2-level (1-bit Binary)',
+                  '4-level (Gameboy)',
+                  '8-level (Multi-tone)',
+                  'continuous',
+                ],
+                value: '2-level (1-bit Binary)',
+              },
+              {
+                key: 'threshold',
+                label: 'Luminance threshold',
+                type: 'range',
+                min: 0.1,
+                max: 0.9,
+                step: 0.02,
+                value: 0.48,
+                unit: '',
+              },
+              {
+                key: 'spread',
+                label: 'Dither spread range',
+                type: 'range',
+                min: 0,
+                max: 2,
+                step: 0.05,
+                value: 1.1,
+                unit: '',
+              },
+              {
+                key: 'contrast',
+                label: 'Input contrast boost',
+                type: 'range',
+                min: 0.5,
+                max: 3.0,
+                step: 0.05,
+                value: 1.35,
+                unit: 'x',
+              },
+            ],
+          },
+          {
+            title: 'CRT Optics & Atmosphere',
+            controls: [
+              {
+                key: 'bloomGlow',
+                label: 'Phosphor bloom glow',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.05,
+                value: 0.4,
+                unit: '',
+              },
+              {
+                key: 'scanlines',
+                label: 'CRT scanlines opacity',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.05,
+                value: 0.22,
+                unit: '',
+              },
+              {
+                key: 'vignette',
+                label: 'Cinematic vignette',
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.05,
+                value: 0.35,
+                unit: '',
+              },
+            ],
+          },
+        ],
+
+        // Internal rendering buffers (zero allocation per frame)
+        animTime: 0,
+        cols: 0,
+        rows: 0,
+        sampleCanvas: document.createElement('canvas'),
+        sampleCtx: null,
+        offCanvas: document.createElement('canvas'),
+        offCtx: null,
+        imgData: null,
+        pixels32: null,
+        lumGrid: null,
+        beamGrid: null,
+        srcRGrid: null,
+        srcGGrid: null,
+        srcBGrid: null,
+
+        initBuffers(cols, rows) {
+          if (this.cols === cols && this.rows === rows && this.imgData) return
+          this.cols = cols
+          this.rows = rows
+
+          this.sampleCanvas.width = cols
+          this.sampleCanvas.height = rows
+          this.sampleCtx = this.sampleCanvas.getContext('2d', {
+            willReadFrequently: true,
+          })
+
+          this.offCanvas.width = cols
+          this.offCanvas.height = rows
+          this.offCtx = this.offCanvas.getContext('2d')
+
+          this.imgData = this.offCtx.createImageData(cols, rows)
+          this.pixels32 = new Uint32Array(this.imgData.data.buffer)
+
+          const size = cols * rows
+          this.lumGrid = new Float32Array(size)
+          this.beamGrid = new Float32Array(size)
+          this.srcRGrid = new Uint8Array(size)
+          this.srcGGrid = new Uint8Array(size)
+          this.srcBGrid = new Uint8Array(size)
+        },
+
+        applyPreset(name) {
+          const v = values[this.id]
+          if (!v) return
+          v.presetStyle = name
+
+          if (name === 'Dither Wave Cyan (Shaders.com)') {
+            v.colorPalette = 'neon-cyan'
+            v.beamDirection = 'down'
+            v.beamLength = 36
+            v.beamIntensity = 1.35
+            v.beamDecay = 0.88
+            v.waveSpeed = 1.4
+            v.waveFrequency = 2.8
+            v.waveAmplitude = 0.45
+            v.wavePattern = 'ocean-swell'
+            v.pixelSize = 4
+            v.ditherPattern = 'bayer4'
+            v.ditherLevels = '2-level (1-bit Binary)'
+            v.threshold = 0.48
+            v.spread = 1.1
+            v.contrast = 1.35
+            v.bloomGlow = 0.4
+            v.scanlines = 0.22
+            v.vignette = 0.35
+          } else if (name === 'Laser Beams Green (CRT Matrix)') {
+            v.colorPalette = 'cyber-green'
+            v.beamDirection = 'down'
+            v.beamLength = 65
+            v.beamIntensity = 1.75
+            v.beamDecay = 0.92
+            v.waveSpeed = 1.2
+            v.waveFrequency = 3.5
+            v.waveAmplitude = 0.3
+            v.wavePattern = 'harmonic-sine'
+            v.pixelSize = 3
+            v.ditherPattern = 'bayer8'
+            v.ditherLevels = '2-level (1-bit Binary)'
+            v.threshold = 0.42
+            v.spread = 1.2
+            v.contrast = 1.5
+            v.bloomGlow = 0.6
+            v.scanlines = 0.35
+            v.vignette = 0.4
+          } else if (name === 'Amber Horizon (Terminal Wave)') {
+            v.colorPalette = 'amber-crt'
+            v.beamDirection = 'up'
+            v.beamLength = 48
+            v.beamIntensity = 1.4
+            v.beamDecay = 0.86
+            v.waveSpeed = 1.0
+            v.waveFrequency = 2.0
+            v.waveAmplitude = 0.55
+            v.wavePattern = 'harmonic-sine'
+            v.pixelSize = 5
+            v.ditherPattern = 'bayer4'
+            v.ditherLevels = '2-level (1-bit Binary)'
+            v.threshold = 0.45
+            v.spread = 1.0
+            v.contrast = 1.4
+            v.bloomGlow = 0.5
+            v.scanlines = 0.25
+            v.vignette = 0.35
+          } else if (name === 'Solar Flare (Heatwave Beams)') {
+            v.colorPalette = 'sunset'
+            v.beamDirection = 'diagonal-down'
+            v.beamLength = 45
+            v.beamIntensity = 1.5
+            v.beamDecay = 0.88
+            v.waveSpeed = 2.0
+            v.waveFrequency = 3.2
+            v.waveAmplitude = 0.55
+            v.wavePattern = 'diagonal-flow'
+            v.pixelSize = 4
+            v.ditherPattern = 'clustered-dot'
+            v.ditherLevels = '2-level (1-bit Binary)'
+            v.threshold = 0.46
+            v.spread = 1.15
+            v.contrast = 1.45
+            v.bloomGlow = 0.5
+            v.scanlines = 0.2
+            v.vignette = 0.3
+          } else if (name === 'GameBoy 4-Tone (Retro Lo-Fi)') {
+            v.colorPalette = 'gameboy'
+            v.beamDirection = 'down'
+            v.beamLength = 22
+            v.beamIntensity = 1.1
+            v.beamDecay = 0.82
+            v.waveSpeed = 0.8
+            v.waveFrequency = 2.2
+            v.waveAmplitude = 0.35
+            v.wavePattern = 'ocean-swell'
+            v.pixelSize = 6
+            v.ditherPattern = 'bayer4'
+            v.ditherLevels = '4-level (Gameboy)'
+            v.threshold = 0.5
+            v.spread = 1.25
+            v.contrast = 1.2
+            v.bloomGlow = 0.1
+            v.scanlines = 0.15
+            v.vignette = 0.2
+          } else if (name === 'Cyberpunk Neon (Dual Chromatic)') {
+            v.colorPalette = 'custom'
+            v.colorA = '#140026'
+            v.colorB = '#00f7ff'
+            v.beamDirection = 'horizontal'
+            v.beamLength = 52
+            v.beamIntensity = 1.6
+            v.beamDecay = 0.9
+            v.waveSpeed = 1.8
+            v.waveFrequency = 4.0
+            v.waveAmplitude = 0.6
+            v.wavePattern = 'glitch-steps'
+            v.pixelSize = 4
+            v.ditherPattern = 'bayer4'
+            v.ditherLevels = '2-level (1-bit Binary)'
+            v.threshold = 0.45
+            v.spread = 1.2
+            v.contrast = 1.5
+            v.bloomGlow = 0.55
+            v.scanlines = 0.3
+            v.vignette = 0.4
+          } else if (name === 'Source Color Rainbow Dither') {
+            v.colorPalette = 'source-rgb'
+            v.beamDirection = 'down'
+            v.beamLength = 35
+            v.beamIntensity = 1.3
+            v.beamDecay = 0.86
+            v.waveSpeed = 1.4
+            v.waveFrequency = 2.5
+            v.waveAmplitude = 0.4
+            v.wavePattern = 'harmonic-sine'
+            v.pixelSize = 4
+            v.ditherPattern = 'bayer8'
+            v.ditherLevels = 'continuous'
+            v.threshold = 0.48
+            v.spread = 1.1
+            v.contrast = 1.35
+            v.bloomGlow = 0.35
+            v.scanlines = 0.18
+            v.vignette = 0.25
+          }
+
+          renderPanel()
+        },
+
+        draw(v, dt) {
+          const { W, H } = env
+          if (!W || !H) return 'Initializing'
+
+          this.animTime += dt * v.waveSpeed
+          const time = this.animTime
+
+          const pSize = Math.max(2, Math.floor(v.pixelSize))
+          const cols = Math.ceil(W / pSize)
+          const rows = Math.ceil(H / pSize)
+          this.initBuffers(cols, rows)
+
+          // 1. Downscale source frame into sample buffer
+          this.sampleCtx.drawImage(env.sourceCanvas, 0, 0, cols, rows)
+          const srcData = this.sampleCtx.getImageData(0, 0, cols, rows).data
+
+          const lumGrid = this.lumGrid
+          const beamGrid = this.beamGrid
+          const srcRGrid = this.srcRGrid
+          const srcGGrid = this.srcGGrid
+          const srcBGrid = this.srcBGrid
+          const pixels32 = this.pixels32
+
+          const wFreq = v.waveFrequency
+          const wAmp = v.waveAmplitude
+          const wPattern = v.wavePattern
+          const cursor = env.cursor
+          const hasCursor = cursor && (cursor.x > 0 || cursor.y > 0)
+          const mouseU = hasCursor ? cursor.x / W : -10
+          const mouseV = hasCursor ? cursor.y / H : -10
+          const rippleStrength = v.interactiveRipple
+
+          // 2. Wave displacement & luminance sampling
+          for (let y = 0; y < rows; y++) {
+            const vCoord = y / rows
+            for (let x = 0; x < cols; x++) {
+              const uCoord = x / cols
+              let dispX = 0
+              let dispY = 0
+              let waveLum = 0
+
+              if (wPattern === 'ocean-swell') {
+                const swell = Math.sin(
+                  (uCoord * 2.2 + vCoord * 3.4) * wFreq - time,
+                )
+                dispX = swell * 0.05 * wAmp
+                dispY =
+                  Math.cos((uCoord * 3.0 - vCoord * 1.5) * wFreq + time * 0.8) *
+                  0.04 *
+                  wAmp
+                waveLum = (swell * 0.5 + 0.5) * (wAmp * 0.45)
+              } else if (wPattern === 'diagonal-flow') {
+                const diag = Math.sin(
+                  (uCoord + vCoord) * wFreq * 3.8 - time * 1.6,
+                )
+                dispX = diag * 0.045 * wAmp
+                dispY = diag * 0.045 * wAmp
+                waveLum = (diag * 0.5 + 0.5) * (wAmp * 0.5)
+              } else if (wPattern === 'radial-pulse') {
+                const dx = uCoord - 0.5
+                const dy = vCoord - 0.5
+                const r = Math.hypot(dx, dy)
+                const p = Math.sin(r * wFreq * 16.0 - time * 2.5)
+                dispX = (dx / (r || 1)) * p * 0.05 * wAmp
+                dispY = (dy / (r || 1)) * p * 0.05 * wAmp
+                waveLum = (p * 0.5 + 0.5) * (wAmp * 0.4)
+              } else if (wPattern === 'glitch-steps') {
+                const step = Math.floor(vCoord * 14.0)
+                const g =
+                  (Math.sin(step * 78.2 + Math.floor(time * 5.0)) > 0.4
+                    ? 0.06
+                    : -0.02) * wAmp
+                dispX = g
+                dispY = 0
+                waveLum = (step % 2 === 0 ? 0.2 : -0.1) * wAmp
+              } else {
+                // harmonic-sine (default)
+                const w1 = Math.sin(vCoord * wFreq * 6.28 + time)
+                const w2 = Math.cos(uCoord * wFreq * 4.71 - time * 0.7)
+                dispX = (w1 * 0.035 + w2 * 0.02) * wAmp
+                dispY =
+                  (Math.cos(vCoord * wFreq * 5.0 - time * 0.8) * 0.035 +
+                    Math.sin(uCoord * wFreq * 3.14 + time) * 0.02) *
+                  wAmp
+                waveLum =
+                  (Math.sin(
+                    (uCoord * 1.5 + vCoord * 2.5) * wFreq * 3.14 - time,
+                  ) *
+                    0.5 +
+                    0.5) *
+                  (wAmp * 0.4)
+              }
+
+              // Interactive mouse ripple deflection
+              if (hasCursor) {
+                const dist = Math.hypot(uCoord - mouseU, vCoord - mouseV)
+                if (dist < 0.45) {
+                  const rip =
+                    Math.sin(dist * 28.0 - time * 9.0) *
+                    Math.exp(-dist * 5.0) *
+                    rippleStrength *
+                    0.07
+                  dispX += ((uCoord - mouseU) / (dist || 1)) * rip
+                  dispY += ((vCoord - mouseV) / (dist || 1)) * rip
+                  waveLum += rip * 2.5
+                }
+              }
+
+              const sx = Math.max(
+                0,
+                Math.min(cols - 1, Math.round((uCoord + dispX) * cols)),
+              )
+              const sy = Math.max(
+                0,
+                Math.min(rows - 1, Math.round((vCoord + dispY) * rows)),
+              )
+              const sidx = (sy * cols + sx) * 4
+
+              const r = srcData[sidx]
+              const g = srcData[sidx + 1]
+              const b = srcData[sidx + 2]
+
+              const idx = y * cols + x
+              srcRGrid[idx] = r
+              srcGGrid[idx] = g
+              srcBGrid[idx] = b
+
+              let lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+              lum = Math.min(1, Math.max(0, lum + waveLum))
+              lumGrid[idx] = lum
+            }
+          }
+
+          // 3. Pixel Beams Extrusion
+          const bDir = v.beamDirection
+          const intensity = v.beamIntensity
+          const decay = v.beamDecay
+          const beamThreshold = 0.42
+
+          if (bDir === 'down') {
+            for (let x = 0; x < cols; x++) {
+              let beam = 0
+              for (let y = 0; y < rows; y++) {
+                const idx = y * cols + x
+                const lum = lumGrid[idx]
+                const emit =
+                  lum > beamThreshold
+                    ? (lum - beamThreshold) * 1.8 * intensity
+                    : 0
+                beam = Math.max(emit, beam * decay)
+                beamGrid[idx] = beam
+              }
+            }
+          } else if (bDir === 'up') {
+            for (let x = 0; x < cols; x++) {
+              let beam = 0
+              for (let y = rows - 1; y >= 0; y--) {
+                const idx = y * cols + x
+                const lum = lumGrid[idx]
+                const emit =
+                  lum > beamThreshold
+                    ? (lum - beamThreshold) * 1.8 * intensity
+                    : 0
+                beam = Math.max(emit, beam * decay)
+                beamGrid[idx] = beam
+              }
+            }
+          } else if (bDir === 'horizontal') {
+            for (let y = 0; y < rows; y++) {
+              let beam = 0
+              for (let x = 0; x < cols; x++) {
+                const idx = y * cols + x
+                const lum = lumGrid[idx]
+                const emit =
+                  lum > beamThreshold
+                    ? (lum - beamThreshold) * 1.8 * intensity
+                    : 0
+                beam = Math.max(emit, beam * decay)
+                beamGrid[idx] = beam
+              }
+            }
+          } else if (bDir === 'diagonal-down') {
+            for (let y = 0; y < rows; y++) {
+              for (let x = 0; x < cols; x++) {
+                const prev =
+                  x > 0 && y > 0 ? beamGrid[(y - 1) * cols + (x - 1)] : 0
+                const idx = y * cols + x
+                const lum = lumGrid[idx]
+                const emit =
+                  lum > beamThreshold
+                    ? (lum - beamThreshold) * 1.8 * intensity
+                    : 0
+                beamGrid[idx] = Math.max(emit, prev * decay)
+              }
+            }
+          } else {
+            // radial-out
+            const cx = cols / 2
+            const cy = rows / 2
+            for (let y = 0; y < rows; y++) {
+              for (let x = 0; x < cols; x++) {
+                const idx = y * cols + x
+                const dist = Math.hypot(x - cx, y - cy)
+                const radialFactor =
+                  Math.sin(dist * 0.15 - time * 2.0) * 0.5 + 0.5
+                const lum = lumGrid[idx]
+                const emit =
+                  lum > beamThreshold
+                    ? (lum - beamThreshold) * 1.5 * intensity
+                    : 0
+                beamGrid[idx] = emit * (0.6 + radialFactor * 0.6)
+              }
+            }
+          }
+
+          // 4. Dithering Matrix calculation & Color mapping
+          const pattern = v.ditherPattern
+          const levels = v.ditherLevels
+          const threshold = v.threshold
+          const spread = v.spread
+          const contrast = v.contrast
+          const palette = v.colorPalette
+
+          const customA = parseHexColor(v.colorA)
+          const customB = parseHexColor(v.colorB)
+
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const idx = y * cols + x
+              let effLum = lumGrid[idx] + beamGrid[idx] * 0.85
+              effLum = Math.max(0, Math.min(1, (effLum - 0.5) * contrast + 0.5))
+
+              // Pattern matrix threshold lookup
+              let bVal = 0.5
+              if (pattern === 'bayer4') {
+                bVal = BAYER4_DATA[(y & 3) * 4 + (x & 3)]
+              } else if (pattern === 'bayer8') {
+                bVal = BAYER8_DATA[(y & 7) * 8 + (x & 7)]
+              } else if (pattern === 'bayer2') {
+                bVal = BAYER2_DATA[(y & 1) * 2 + (x & 1)]
+              } else if (pattern === 'clustered-dot') {
+                bVal = CLUSTERED4_DATA[(y & 3) * 4 + (x & 3)]
+              } else if (pattern === 'blue-noise') {
+                bVal = hashNoise(x, y)
+              }
+
+              const dithered = effLum + (bVal - 0.5) * spread
+
+              // Quantize levels
+              let state = 0
+              if (levels.startsWith('2-level')) {
+                state = dithered >= threshold ? 1.0 : 0.0
+              } else if (levels.startsWith('4-level')) {
+                const q = Math.floor((dithered - threshold + 0.5) * 3 + 0.5)
+                state = Math.max(0, Math.min(3, q)) / 3
+              } else if (levels.startsWith('8-level')) {
+                const q = Math.floor((dithered - threshold + 0.5) * 7 + 0.5)
+                state = Math.max(0, Math.min(7, q)) / 7
+              } else {
+                state = Math.max(0, Math.min(1, dithered))
+              }
+
+              // Color mapping
+              let r = 0,
+                g = 0,
+                b = 0
+              if (palette === 'neon-cyan') {
+                if (state <= 0) {
+                  r = 6
+                  g = 10
+                  b = 28
+                } else {
+                  const core = Math.max(0, Math.min(1, (effLum - 0.72) / 0.28))
+                  r = Math.round(0 + core * 210)
+                  g = Math.round(225 + core * 30)
+                  b = 255
+                }
+              } else if (palette === 'cyber-green') {
+                if (state <= 0) {
+                  r = 3
+                  g = 14
+                  b = 8
+                } else {
+                  const core = Math.max(0, Math.min(1, (effLum - 0.72) / 0.28))
+                  r = Math.round(core * 200)
+                  g = 255
+                  b = Math.round(100 + core * 145)
+                }
+              } else if (palette === 'amber-crt') {
+                if (state <= 0) {
+                  r = 16
+                  g = 6
+                  b = 1
+                } else {
+                  const core = Math.max(0, Math.min(1, (effLum - 0.72) / 0.28))
+                  r = 255
+                  g = Math.round(145 + core * 100)
+                  b = Math.round(core * 180)
+                }
+              } else if (palette === 'gameboy') {
+                if (state < 0.25) {
+                  r = 15
+                  g = 56
+                  b = 15
+                } else if (state < 0.55) {
+                  r = 48
+                  g = 98
+                  b = 48
+                } else if (state < 0.85) {
+                  r = 139
+                  g = 172
+                  b = 15
+                } else {
+                  r = 155
+                  g = 188
+                  b = 15
+                }
+              } else if (palette === 'sunset') {
+                if (state <= 0) {
+                  r = 18
+                  g = 4
+                  b = 30
+                } else if (effLum < 0.55) {
+                  r = 255
+                  g = 16
+                  b = 120
+                } else if (effLum < 0.8) {
+                  r = 255
+                  g = 170
+                  b = 20
+                } else {
+                  r = 255
+                  g = 245
+                  b = 180
+                }
+              } else if (palette === 'source-rgb') {
+                const sr = srcRGrid[idx]
+                const sg = srcGGrid[idx]
+                const sb = srcBGrid[idx]
+                if (state <= 0.05) {
+                  r = Math.round(sr * 0.12)
+                  g = Math.round(sg * 0.12)
+                  b = Math.round(sb * 0.12)
+                } else {
+                  r = Math.min(
+                    255,
+                    Math.round(sr * (0.4 + state * 1.1) + state * 40),
+                  )
+                  g = Math.min(
+                    255,
+                    Math.round(sg * (0.4 + state * 1.1) + state * 40),
+                  )
+                  b = Math.min(
+                    255,
+                    Math.round(sb * (0.4 + state * 1.1) + state * 40),
+                  )
+                }
+              } else if (palette === 'monochrome') {
+                const val = Math.round(state * 245 + 10)
+                r = val
+                g = val
+                b = val
+              } else {
+                // custom
+                const t = state
+                r = Math.round(customA[0] + (customB[0] - customA[0]) * t)
+                g = Math.round(customA[1] + (customB[1] - customA[1]) * t)
+                b = Math.round(customA[2] + (customB[2] - customA[2]) * t)
+                if (effLum > 0.8) {
+                  const boost = (effLum - 0.8) / 0.2
+                  r = Math.min(255, Math.round(r + boost * 55))
+                  g = Math.min(255, Math.round(g + boost * 55))
+                  b = Math.min(255, Math.round(b + boost * 55))
+                }
+              }
+
+              pixels32[idx] = packRgba32(r, g, b, 255)
+            }
+          }
+
+          // 5. Draw dither buffer to main screen
+          this.offCtx.putImageData(this.imgData, 0, 0)
+
+          ctx.imageSmoothingEnabled = false
+          ctx.drawImage(this.offCanvas, 0, 0, W, H)
+
+          // 6. Phosphor Bloom Glow
+          if (v.bloomGlow > 0.01) {
+            ctx.save()
+            ctx.globalCompositeOperation = 'screen'
+            ctx.globalAlpha = v.bloomGlow
+            ctx.filter = 'blur(6px)'
+            ctx.drawImage(this.offCanvas, 0, 0, W, H)
+            ctx.restore()
+          }
+
+          // 7. CRT Scanlines
+          if (v.scanlines > 0.01) {
+            ctx.save()
+            ctx.fillStyle = `rgba(0, 0, 0, ${v.scanlines})`
+            const step = Math.max(2, pSize)
+            for (let y = 0; y < H; y += step) {
+              ctx.fillRect(0, y, W, 1)
+            }
+            ctx.restore()
+          }
+
+          // 8. Cinematic Vignette
+          if (v.vignette > 0.01) {
+            ctx.save()
+            const vig = ctx.createRadialGradient(
+              W / 2,
+              H / 2,
+              Math.min(W, H) * 0.35,
+              W / 2,
+              H / 2,
+              Math.max(W, H) * 0.72,
+            )
+            vig.addColorStop(0, 'rgba(0, 0, 0, 0)')
+            vig.addColorStop(1, `rgba(0, 0, 0, ${v.vignette * 0.9})`)
+            ctx.fillStyle = vig
+            ctx.fillRect(0, 0, W, H)
+            ctx.restore()
+          }
+
+          return `Dither Wave ${cols}×${rows} · ${pSize}px · ${v.colorPalette} · ${v.ditherPattern} · ${v.beamDirection} beams`
+        },
+      }
+
+      // ======================================================================
+      // Effect Registry & UI Panel Builder
+      // ======================================================================
+      const effects = [
+        quadtreeBokeh,
+        blobTracker,
+        pixelTrail,
+        fingerSketch,
+        pixelBeams,
+      ]
+      const values = {}
+
+      effects.forEach((effect) => {
+        values[effect.id] = {}
+        effect.groups.forEach((g) =>
+          g.controls.forEach((c) => {
+            values[effect.id][c.key] = c.value !== undefined ? c.value : null
+          }),
+        )
+      })
+
+      let activeEffect = effects[0]
+
+      const menuEl = document.getElementById('menu')
+      const panelEl = document.getElementById('panel')
+
+      function updateStageTools() {
+        const clearBtn = document.getElementById('stageClearBtn')
+        if (clearBtn) {
+          clearBtn.style.display =
+            activeEffect.id === 'finger-sketch' ? 'block' : 'none'
+        }
+      }
+
+      function renderMenu() {
+        menuEl.innerHTML = ''
+        effects.forEach((effect) => {
+          const btn = document.createElement('button')
+          btn.textContent = effect.label
+          btn.className = effect === activeEffect ? 'active' : ''
+          btn.addEventListener('click', () => {
+            activeEffect = effect
+            renderMenu()
+            renderPanel()
+          })
+          menuEl.appendChild(btn)
+        })
+        updateStageTools()
+      }
+
+      function renderPanel() {
+        panelEl.innerHTML = ''
+        const v = values[activeEffect.id]
+
+        activeEffect.groups.forEach((group) => {
+          const groupEl = document.createElement('section')
+          groupEl.className = 'group'
+          groupEl.innerHTML = `<h3>${group.title}</h3>`
+
+          group.controls.forEach((c) => {
+            const wrap = document.createElement('div')
+            wrap.className =
+              'control' + (c.type === 'checkbox' ? ' inline' : '')
+            const id = `ctl-${activeEffect.id}-${c.key}`
+
+            if (c.type === 'range') {
+              wrap.innerHTML = `<div class="row"><label for="${id}">${c.label}</label><output></output></div>
+                                <input id="${id}" type="range" min="${c.min}" max="${c.max}" step="${c.step}">`
+              const input = wrap.querySelector('input')
+              const out = wrap.querySelector('output')
+              input.value = v[c.key]
+              const update = () => {
+                v[c.key] = Number(input.value)
+                out.textContent = v[c.key] + (c.unit || '')
+              }
+              input.addEventListener('input', update)
+              update()
+            } else if (c.type === 'select') {
+              wrap.innerHTML = `<label for="${id}">${c.label}</label>
+                                <select id="${id}">${c.options.map((o) => `<option>${o}</option>`).join('')}</select>`
+              const select = wrap.querySelector('select')
+              select.value = v[c.key]
+              const numeric = typeof c.options[0] === 'number'
+              select.addEventListener('change', () => {
+                v[c.key] = numeric ? Number(select.value) : select.value
+                if (typeof c.onChange === 'function') {
+                  c.onChange(v[c.key])
+                }
+              })
+            } else if (c.type === 'color') {
+              wrap.className = 'control inline color'
+              wrap.innerHTML = `<input id="${id}" type="color"><label for="${id}">${c.label}</label>`
+              const input = wrap.querySelector('input')
+              input.value = v[c.key]
+              input.addEventListener('input', () => {
+                v[c.key] = input.value
+              })
+            } else if (c.type === 'checkbox') {
+              wrap.innerHTML = `<input id="${id}" type="checkbox"><label for="${id}">${c.label}</label>`
+              const input = wrap.querySelector('input')
+              input.checked = v[c.key]
+              input.addEventListener('change', () => {
+                v[c.key] = input.checked
+              })
+            } else if (c.type === 'text') {
+              wrap.innerHTML = `<label for="${id}">${c.label}</label>
+                                <input id="${id}" type="text" class="text-input">`
+              const input = wrap.querySelector('input')
+              input.value =
+                v[c.key] !== undefined && v[c.key] !== null && v[c.key] !== ''
+                  ? v[c.key]
+                  : c.value || ''
+              v[c.key] = input.value
+              input.addEventListener('input', () => {
+                v[c.key] = input.value
+              })
+            } else if (c.type === 'button') {
+              wrap.innerHTML = `<button id="${id}" class="btn btn-primary" style="width: 100%; margin-top: 4px; padding: 7px 10px; font-weight: 600;">${c.label}</button>`
+              const btn = wrap.querySelector('button')
+              btn.addEventListener('click', () => {
+                if (c.onClick) c.onClick()
+              })
+            }
+            groupEl.appendChild(wrap)
+          })
+          panelEl.appendChild(groupEl)
+        })
+      }
+
+      // ======================================================================
+      // Media Sources: Image, Video, Webcam & Animated Motion Demo
+      // ======================================================================
+      function setCanvasDimensions(sw, sh) {
+        const scale = Math.min(960 / sw, 640 / sh, 1.5)
+        env.W = Math.max(ROOT, Math.floor((sw * scale) / ROOT) * ROOT)
+        env.H = Math.max(ROOT, Math.floor((sh * scale) / ROOT) * ROOT)
+        canvas.width = env.W
+        canvas.height = env.H
+        env.sourceCanvas.width = env.W
+        env.sourceCanvas.height = env.H
+        env.cursor.x = env.cursor.targetX = env.W / 2
+        env.cursor.y = env.cursor.targetY = env.H / 2
+      }
+
+      function stopActiveMedia() {
+        if (env.sourceVideo) {
+          env.sourceVideo.pause()
+          if (env.sourceVideo.srcObject) {
+            env.sourceVideo.srcObject.getTracks().forEach((t) => t.stop())
+          }
+          env.sourceVideo = null
+        }
+      }
+
+      function loadImageSource(img) {
+        stopActiveMedia()
+        env.sourceType = 'image'
+        sourceBadge.textContent = 'IMAGE'
+        sourceBadge.style.color = '#8c9eff'
+        setCanvasDimensions(
+          img.naturalWidth || img.width,
+          img.naturalHeight || img.height,
+        )
+        env.sourceCtx.drawImage(img, 0, 0, env.W, env.H)
+        buildTables(env.sourceCtx.getImageData(0, 0, env.W, env.H))
+      }
+
+      function loadVideoElement(video, label = 'VIDEO') {
+        stopActiveMedia()
+        env.sourceVideo = video
+        env.sourceType = 'video'
+        sourceBadge.textContent = label
+        sourceBadge.style.color = '#00ff88'
+
+        const onReady = () => {
+          setCanvasDimensions(video.videoWidth || 960, video.videoHeight || 640)
+        }
+        if (video.readyState >= 2) onReady()
+        else video.addEventListener('loadedmetadata', onReady, { once: true })
+      }
+
+      function loadMediaFile(file) {
+        if (!file) return
+        if (file.type.startsWith('video/')) {
+          const video = document.createElement('video')
+          video.src = URL.createObjectURL(file)
+          video.loop = true
+          video.muted = true
+          video.playsInline = true
+          video.play().catch(() => {})
+          loadVideoElement(video, 'VIDEO FILE')
+        } else if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file)
+          const img = new Image()
+          img.onload = () => {
+            loadImageSource(img)
+            URL.revokeObjectURL(url)
+          }
+          img.src = url
+        }
+      }
+
+      async function loadWebcam() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 960 }, height: { ideal: 640 } },
+          })
+          const video = document.createElement('video')
+          video.srcObject = stream
+          video.muted = true
+          video.playsInline = true
+          video.play()
+          loadVideoElement(video, 'LIVE WEBCAM')
+        } catch (err) {
+          alert('Could not access webcam: ' + err.message)
+        }
+      }
+
+      // Procedural Animated Motion Demo (Simulates high-action video footage)
+      function initMotionDemo() {
+        stopActiveMedia()
+        env.sourceType = 'demo'
+        sourceBadge.textContent = 'MOTION-DEMO'
+        sourceBadge.style.color = '#ff9800'
+        setCanvasDimensions(960, 640)
+
+        env.demoState = {
+          entities: [
+            {
+              x: 180,
+              y: 300,
+              vx: 2.2,
+              vy: 1.6,
+              r: 42,
+              color: '#00ff88',
+              shape: 'orb',
+            },
+            {
+              x: 500,
+              y: 220,
+              vx: -1.8,
+              vy: 2.1,
+              r: 55,
+              color: '#ec4899',
+              shape: 'box',
+            },
+            {
+              x: 740,
+              y: 400,
+              vx: -2.4,
+              vy: -1.5,
+              r: 36,
+              color: '#38bdf8',
+              shape: 'orb',
+            },
+            {
+              x: 380,
+              y: 450,
+              vx: 1.5,
+              vy: -2.3,
+              r: 48,
+              color: '#fbbf24',
+              shape: 'poly',
+            },
+          ],
+          particles: [],
+        }
+      }
+
+      function updateAndDrawMotionDemo(dt) {
+        const s = env.demoState
+        const c = env.sourceCtx
+        const { W, H } = env
+
+        // Dark tech gradient background with subtle scanlines
+        c.fillStyle = '#06070c'
+        c.fillRect(0, 0, W, H)
+
+        // Background animated grid lines
+        c.strokeStyle = 'rgba(255, 255, 255, 0.04)'
+        c.lineWidth = 1
+        const gridSize = 40
+        const offset = (env.time * 20) % gridSize
+        c.beginPath()
+        for (let x = offset; x < W; x += gridSize) {
+          c.moveTo(x, 0)
+          c.lineTo(x, H)
+        }
+        for (let y = offset; y < H; y += gridSize) {
+          c.moveTo(0, y)
+          c.lineTo(W, y)
+        }
+        c.stroke()
+
+        // Update and draw moving neon entities
+        s.entities.forEach((e) => {
+          e.x += e.vx
+          e.y += e.vy
+          if (e.x - e.r < 0 || e.x + e.r > W) e.vx *= -1
+          if (e.y - e.r < 0 || e.y + e.r > H) e.vy *= -1
+
+          // Radial glow
+          const grad = c.createRadialGradient(
+            e.x,
+            e.y,
+            e.r * 0.2,
+            e.x,
+            e.y,
+            e.r * 1.8,
+          )
+          grad.addColorStop(0, e.color)
+          grad.addColorStop(1, 'transparent')
+          c.fillStyle = grad
+          c.beginPath()
+          c.arc(e.x, e.y, e.r * 1.8, 0, TAU)
+          c.fill()
+
+          // Solid core
+          c.fillStyle = '#ffffff'
+          c.strokeStyle = e.color
+          c.lineWidth = 3
+          if (e.shape === 'orb') {
+            c.beginPath()
+            c.arc(e.x, e.y, e.r * 0.6, 0, TAU)
+            c.fill()
+            c.stroke()
+          } else if (e.shape === 'box') {
+            const sz = e.r * 1.1
+            c.fillRect(e.x - sz / 2, e.y - sz / 2, sz, sz)
+            c.strokeRect(e.x - sz / 2, e.y - sz / 2, sz, sz)
+          } else {
+            // Polygon
+            c.save()
+            c.translate(e.x, e.y)
+            c.rotate(env.time * 2)
+            c.beginPath()
+            const sides = 5
+            for (let k = 0; k < sides; k++) {
+              const a = (k * TAU) / sides
+              const px = Math.cos(a) * e.r * 0.7
+              const py = Math.sin(a) * e.r * 0.7
+              if (k === 0) c.moveTo(px, py)
+              else c.lineTo(px, py)
+            }
+            c.closePath()
+            c.fill()
+            c.stroke()
+            c.restore()
+          }
+        })
+
+        // Rebuild quadtree tables when motion demo is active
+        buildTables(c.getImageData(0, 0, W, H))
+      }
+
+      // Static Image Presets
+      function makePreset(name) {
+        stopActiveMedia()
+        env.sourceType = 'image'
+        sourceBadge.textContent = 'PRESET IMAGE'
+        sourceBadge.style.color = '#8c9eff'
+
+        const w = 960,
+          h = 640
+        const c = document.createElement('canvas')
+        c.width = w
+        c.height = h
+        const p = c.getContext('2d')
+
+        if (name === 'sunset') {
+          const sky = p.createLinearGradient(0, 0, 0, h)
+          sky.addColorStop(0, '#1b1f4b')
+          sky.addColorStop(0.45, '#c2467a')
+          sky.addColorStop(0.7, '#ff9a4d')
+          sky.addColorStop(1, '#ffd98a')
+          p.fillStyle = sky
+          p.fillRect(0, 0, w, h)
+          p.fillStyle = '#fff3c4'
+          p.beginPath()
+          p.arc(w * 0.62, h * 0.58, 70, 0, TAU)
+          p.fill()
+          const ridges = [
+            ['#4a2a5c', 0.66, 40],
+            ['#2c1a45', 0.76, 55],
+            ['#150f2a', 0.88, 35],
+          ]
+          ridges.forEach(([col, base, amp], k) => {
+            p.fillStyle = col
+            p.beginPath()
+            p.moveTo(0, h)
+            for (let x = 0; x <= w; x += 8) {
+              p.lineTo(
+                x,
+                h * base +
+                  Math.sin(x * 0.012 + k * 2) * amp +
+                  Math.sin(x * 0.037 + k) * amp * 0.4,
+              )
+            }
+            p.lineTo(w, h)
+            p.closePath()
+            p.fill()
+          })
+          p.fillStyle = '#0b0818'
+          for (let i = 0; i < 9; i++) {
+            const x = 80 + i * 105,
+              th = 60 + ((i * 37) % 50)
+            p.beginPath()
+            p.moveTo(x, h)
+            p.lineTo(x + 18, h - th)
+            p.lineTo(x + 36, h)
+            p.fill()
+          }
+        } else if (name === 'portrait') {
+          const bg = p.createRadialGradient(
+            w * 0.7,
+            h * 0.35,
+            40,
+            w * 0.7,
+            h * 0.35,
+            600,
+          )
+          bg.addColorStop(0, '#ff6b6b')
+          bg.addColorStop(0.5, '#5b4bd1')
+          bg.addColorStop(1, '#0c0c1c')
+          p.fillStyle = bg
+          p.fillRect(0, 0, w, h)
+          p.fillStyle = '#12121f'
+          p.beginPath()
+          p.ellipse(w * 0.45, h * 0.95, 260, 200, 0, 0, TAU)
+          p.fill()
+          p.fillStyle = '#2b2140'
+          p.beginPath()
+          p.ellipse(w * 0.45, h * 0.42, 175, 215, 0, 0, TAU)
+          p.fill()
+          p.fillStyle = '#f2c4a0'
+          p.beginPath()
+          p.ellipse(w * 0.46, h * 0.46, 130, 170, 0, 0, TAU)
+          p.fill()
+          p.fillStyle = '#fff'
+          ;[-48, 52].forEach((dx) => {
+            p.beginPath()
+            p.ellipse(w * 0.46 + dx, h * 0.42, 22, 12, 0, 0, TAU)
+            p.fill()
+          })
+          p.fillStyle = '#1f6fb0'
+          ;[-48, 52].forEach((dx) => {
+            p.beginPath()
+            p.arc(w * 0.46 + dx, h * 0.42, 9, 0, TAU)
+            p.fill()
+          })
+          p.fillStyle = '#c93b57'
+          p.beginPath()
+          p.ellipse(w * 0.46 + 4, h * 0.58, 38, 13, 0, 0, TAU)
+          p.fill()
+        } else {
+          p.fillStyle = '#143221'
+          p.fillRect(0, 0, w, h)
+          for (let i = 0; i < 40; i++) {
+            p.fillStyle = `rgba(${30 + ((i * 13) % 50)},${90 + ((i * 29) % 90)},${50 + ((i * 17) % 40)},0.55)`
+            p.beginPath()
+            p.arc((i * 211) % w, (i * 127) % h, 40 + ((i * 23) % 80), 0, TAU)
+            p.fill()
+          }
+          const fx = w / 2,
+            fy = h / 2
+          for (let k = 0; k < 16; k++) {
+            p.save()
+            p.translate(fx, fy)
+            p.rotate((k * TAU) / 16)
+            p.fillStyle = k % 2 ? '#d6336c' : '#f06595'
+            p.beginPath()
+            p.ellipse(150, 0, 130, 38, 0, 0, TAU)
+            p.fill()
+            p.restore()
+          }
+          p.fillStyle = '#ffd43b'
+          p.beginPath()
+          p.arc(fx, fy, 52, 0, TAU)
+          p.fill()
+          p.fillStyle = '#e67700'
+          for (let k = 0; k < 24; k++) {
+            const a = k * 0.26
+            p.beginPath()
+            p.arc(
+              fx + Math.cos(a * 3) * 30,
+              fy + Math.sin(a * 3) * 30,
+              3,
+              0,
+              TAU,
+            )
+            p.fill()
+          }
+        }
+        loadImageSource(c)
+      }
+
+      // ======================================================================
+      // Wiring & Events
+      // ======================================================================
+      document.getElementById('preset').addEventListener('change', (e) => {
+        if (e.target.value === 'motion-demo') {
+          initMotionDemo()
+        } else {
+          makePreset(e.target.value)
+        }
+      })
+
+      document
+        .getElementById('openBtn')
+        .addEventListener('click', () =>
+          document.getElementById('file').click(),
+        )
+      document
+        .getElementById('file')
+        .addEventListener('change', (e) => loadMediaFile(e.target.files[0]))
+      document.getElementById('webcamBtn').addEventListener('click', loadWebcam)
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const a = document.createElement('a')
+        a.download = `${activeEffect.id}-${Date.now()}.png`
+        a.href = canvas.toDataURL('image/png')
+        a.click()
+      })
+
+      function getCanvasCoords(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect()
+        const x = (clientX - rect.left) * (env.W / rect.width)
+        const y = (clientY - rect.top) * (env.H / rect.height)
+        return {
+          x: Math.max(0, Math.min(env.W, x)),
+          y: Math.max(0, Math.min(env.H, y)),
+        }
+      }
+
+      function setCursor(clientX, clientY) {
+        const pt = getCanvasCoords(clientX, clientY)
+        env.cursor.targetX = pt.x
+        env.cursor.targetY = pt.y
+        env.cursor.lastMoveAt = performance.now()
+        return pt
+      }
+
+      canvas.addEventListener('mousedown', (e) => {
+        env.cursor.isDown = true
+        const pt = setCursor(e.clientX, e.clientY)
+        env.cursor.x = pt.x
+        env.cursor.y = pt.y
+        if (activeEffect.onPointerDown) {
+          activeEffect.onPointerDown(pt.x, pt.y, e)
+        }
+      })
+
+      window.addEventListener('mouseup', (e) => {
+        if (env.cursor.isDown) {
+          env.cursor.isDown = false
+          if (activeEffect.onPointerUp) {
+            const pt = getCanvasCoords(e.clientX, e.clientY)
+            activeEffect.onPointerUp(pt.x, pt.y, e)
+          }
+        }
+      })
+
+      canvas.addEventListener('mousemove', (e) => {
+        const pt = setCursor(e.clientX, e.clientY)
+        if (activeEffect.onPointerMove) {
+          activeEffect.onPointerMove(pt.x, pt.y, env.cursor.isDown, e)
+        }
+      })
+
+      canvas.addEventListener(
+        'touchstart',
+        (e) => {
+          e.preventDefault()
+          env.cursor.isDown = true
+          const touch = e.touches[0]
+          const pt = setCursor(touch.clientX, touch.clientY)
+          env.cursor.x = pt.x
+          env.cursor.y = pt.y
+          if (activeEffect.onPointerDown) {
+            activeEffect.onPointerDown(pt.x, pt.y, e)
+          }
+        },
+        { passive: false },
+      )
+
+      canvas.addEventListener(
+        'touchmove',
+        (e) => {
+          e.preventDefault()
+          const touch = e.touches[0]
+          const pt = setCursor(touch.clientX, touch.clientY)
+          if (activeEffect.onPointerMove) {
+            activeEffect.onPointerMove(pt.x, pt.y, env.cursor.isDown, e)
+          }
+        },
+        { passive: false },
+      )
+
+      window.addEventListener('touchend', (e) => {
+        if (env.cursor.isDown) {
+          env.cursor.isDown = false
+          if (activeEffect.onPointerUp) {
+            activeEffect.onPointerUp(env.cursor.targetX, env.cursor.targetY, e)
+          }
+        }
+      })
+
+      // Stage clear button & keyboard shortcut 'C'
+      const stageClearBtn = document.getElementById('stageClearBtn')
+      if (stageClearBtn) {
+        stageClearBtn.addEventListener('click', () => {
+          if (typeof fingerSketch.clear === 'function') {
+            fingerSketch.clear()
+          }
+        })
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')
+          return
+        if (e.key === 'c' || e.key === 'C') {
+          if (
+            activeEffect.id === 'finger-sketch' &&
+            typeof fingerSketch.clear === 'function'
+          ) {
+            fingerSketch.clear()
+          }
+        }
+      })
+
+      stage.addEventListener('dragover', (e) => {
+        e.preventDefault()
+        stage.classList.add('dragging')
+      })
+      stage.addEventListener('dragleave', () =>
+        stage.classList.remove('dragging'),
+      )
+      stage.addEventListener('drop', (e) => {
+        e.preventDefault()
+        stage.classList.remove('dragging')
+        loadMediaFile(e.dataTransfer.files[0])
+      })
+
+      // Main RAF loop
+      let lastFrame = performance.now()
+      function frame(now) {
+        const dt = Math.min(0.1, (now - lastFrame) / 1000)
+        lastFrame = now
+
+        // 1. Advance dynamic media source
+        if (env.sourceType === 'demo') {
+          updateAndDrawMotionDemo(dt)
+        } else if (
+          env.sourceType === 'video' &&
+          env.sourceVideo &&
+          env.sourceVideo.readyState >= 2
+        ) {
+          env.sourceCtx.drawImage(env.sourceVideo, 0, 0, env.W, env.H)
+          buildTables(env.sourceCtx.getImageData(0, 0, env.W, env.H))
+        }
+
+        // 2. Draw active effect
+        if (env.W > 0 && env.H > 0) {
+          const t0 = performance.now()
+          const info = activeEffect.draw(values[activeEffect.id], dt)
+          statsEl.textContent = `${info} · ${(performance.now() - t0).toFixed(1)} ms`
+        }
+
+        requestAnimationFrame(frame)
+      }
+
+      // Initialize
+      renderMenu()
+      renderPanel()
+      initMotionDemo()
+      requestAnimationFrame(frame)
+    </script>
+  </body>
+</html>
