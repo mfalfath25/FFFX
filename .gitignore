@@ -1,6 +1,7 @@
 # Dependencies & MCP
 .playwright-mcp/
 node_modules/
+dist/
 
 # OS / Editor files
 .DS_Store
@@ -8,3 +9,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+.edge-test-profile/
+screenshots/
+stdout.txt
+stderr.txt
