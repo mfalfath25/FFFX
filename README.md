@@ -8,24 +8,24 @@ A high-performance real-time creative coding lab for monocular depth estimation,
 
 ### 1. Install Dependencies
 ```bash
-pnpm install
+yarn install
 ```
 
 ### 2. Development Server
 Starts Vite with instant Hot Module Replacement (HMR):
 ```bash
-pnpm dev
+yarn dev
 ```
 
 ### 3. Build for Production / GitHub Pages
 Builds the standalone static application to `dist/`:
 ```bash
-pnpm build
+yarn build
 ```
 
 ### 4. Preview Production Build
 ```bash
-pnpm preview
+yarn preview
 ```
 
 ---
