@@ -8,14 +8,15 @@ export function initMenu({ menuEl, effectPill, onSelectEffect }) {
     render(effects, activeEffect) {
       if (!menuEl) return;
       menuEl.innerHTML = '';
-      effects.forEach((effect) => {
+      effects.forEach((effect, idx) => {
         const btn = document.createElement('button');
         const isActive = effect.id === activeEffect.id;
         btn.className = 'drawer-item' + (isActive ? ' active' : '');
         btn.setAttribute('data-effect-id', effect.id);
+        const idxStr = String(idx + 1).padStart(2, '0');
         btn.innerHTML = `
-          <span>${effect.label.toUpperCase()}</span>
-          <span class="item-state">${isActive ? '[*]' : '[ ]'}</span>
+          <span class="item-text"><span class="item-num">[${idxStr}]</span> ${effect.label.toUpperCase()}</span>
+          <span class="item-state">${isActive ? '[•]' : '[ ]'}</span>
         `;
         btn.addEventListener('click', () => {
           onSelectEffect(effect);

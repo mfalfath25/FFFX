@@ -23,35 +23,43 @@ export function setCanvasDimensions(sw, sh) {
 export function updateMirrorWebcamUI() {
   const mirrorWebcamBtn = document.getElementById('mirrorWebcamBtn');
   if (!mirrorWebcamBtn) return;
-  mirrorWebcamBtn.classList.toggle('active', !!env.mirrorWebcam);
+  const isWebcam = !!env.isWebcam;
+  mirrorWebcamBtn.disabled = !isWebcam;
+  mirrorWebcamBtn.classList.toggle('disabled', !isWebcam);
+  mirrorWebcamBtn.classList.toggle('active', isWebcam && !!env.mirrorWebcam);
   mirrorWebcamBtn.setAttribute(
     'data-tooltip',
-    env.mirrorWebcam
-      ? 'Mirror Camera: ON (H or Click)'
-      : 'Mirror Camera: OFF (H or Click)'
+    !isWebcam
+      ? 'Mirror Camera (Webcam Inactive)'
+      : env.mirrorWebcam
+        ? 'Mirror Camera: ON (H or Click)'
+        : 'Mirror Camera: OFF (H or Click)'
   );
 }
 
 export function toggleMirrorWebcam() {
+  if (!env.isWebcam) return;
   env.mirrorWebcam = !env.mirrorWebcam;
   updateMirrorWebcamUI();
 }
 
+export function toggleWebcam() {
+  if (env.isWebcam) {
+    stopWebcam();
+  } else {
+    loadWebcam();
+  }
+}
+
 export function updateWebcamUI(active) {
   env.isWebcam = active;
-  const stopWebcamBtn = document.getElementById('stopWebcamBtn');
   const webcamBtn = document.getElementById('webcamBtn');
-  if (stopWebcamBtn) {
-    stopWebcamBtn.disabled = !active;
-    stopWebcamBtn.classList.toggle('disabled', !active);
-    stopWebcamBtn.classList.toggle('danger-active', active);
-    stopWebcamBtn.setAttribute(
-      'data-tooltip',
-      active ? 'Stop Live Webcam' : 'Webcam Inactive'
-    );
-  }
   if (webcamBtn) {
     webcamBtn.classList.toggle('active', active);
+    webcamBtn.setAttribute(
+      'data-tooltip',
+      active ? 'Live Webcam: ON (Click to Stop)' : 'Start Live Webcam'
+    );
   }
   updateMirrorWebcamUI();
 }
@@ -233,41 +241,11 @@ export function initMediaControls() {
     });
   });
 
-  // Image Dropdown Menu Trigger
-  const imageDropdownWrap = document.getElementById('imageDropdownWrap');
-  const imageBtn = document.getElementById('imageBtn');
-  if (imageBtn && imageDropdownWrap) {
-    imageBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      imageDropdownWrap.classList.toggle('open');
-    });
-    document.addEventListener('click', (e) => {
-      if (!imageDropdownWrap.contains(e.target)) {
-        imageDropdownWrap.classList.remove('open');
-      }
-    });
-  }
-
+  // Upload Button & File Input
   const fileInput = document.getElementById('file');
-  document.querySelectorAll('#imageMenu .dropdown-item').forEach((item) => {
-    item.addEventListener('click', () => {
-      if (imageDropdownWrap) imageDropdownWrap.classList.remove('open');
-      const act = item.getAttribute('data-action');
-      const preset = item.getAttribute('data-preset');
-      if (act === 'open-file' && fileInput) {
-        fileInput.click();
-      } else if (preset) {
-        makePreset(preset);
-      }
-    });
-  });
-
-  // Video Button
-  const videoBtn = document.getElementById('videoBtn');
-  if (videoBtn) {
-    videoBtn.addEventListener('click', () => {
-      initMotionDemo();
-    });
+  const uploadBtn = document.getElementById('uploadBtn');
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
   }
 
   // File upload drop card & input
@@ -279,13 +257,12 @@ export function initMediaControls() {
     );
   }
 
-  // Webcam & Stop Webcam & Mirror Webcam
+  // Webcam & Mirror Webcam
   const webcamBtn = document.getElementById('webcamBtn');
-  const stopWebcamBtn = document.getElementById('stopWebcamBtn');
   const mirrorWebcamBtn = document.getElementById('mirrorWebcamBtn');
-  if (webcamBtn) webcamBtn.addEventListener('click', loadWebcam);
-  if (stopWebcamBtn) stopWebcamBtn.addEventListener('click', stopWebcam);
+  if (webcamBtn) webcamBtn.addEventListener('click', toggleWebcam);
   if (mirrorWebcamBtn) mirrorWebcamBtn.addEventListener('click', toggleMirrorWebcam);
+  updateMirrorWebcamUI();
 
   // Drag & drop handlers
   const stage = document.getElementById('stage');

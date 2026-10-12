@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TOOOOOOLS · FFFX Vision & Shader Studio</title>
+    <title>FFFX</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,19 +26,19 @@
   </head>
   <body>
     <!-- Column 1: Drawer -->
-    <aside class="app-drawer">
+    <aside class="app-drawer" id="appDrawer">
       <div class="drawer-brand">
-        <div class="brand-title"><span class="brand-box">[ ]</span> TOOOOOOLS.APP</div>
-        <div class="brand-sub">FFFX VISION & SHADER LAB</div>
+        <div class="brand-title">FFFX</div>
+        <div class="brand-sub">SHADER EXPERIMENT</div>
       </div>
 
       <div class="drawer-section">
-        <div class="section-heading">/EFFECTS</div>
+        <div class="section-heading">EFFECTS</div>
         <div class="drawer-list" id="menu"></div>
       </div>
 
       <div class="drawer-section">
-        <div class="section-heading">/SOURCES</div>
+        <div class="section-heading">DEMO</div>
         <div class="drawer-list" id="drawerSources">
           <button class="drawer-item active" data-source="motion-demo">
             <span>MOTION DEMO</span>
@@ -52,22 +52,315 @@
       </div>
 
       <div class="drawer-shortcuts">
-        <div class="section-heading">/SHORTCUTS</div>
+        <div class="section-heading">SHORTCUTS</div>
+        <div class="shortcut-row"><span>TOGGLE CATALOG</span><kbd>[</kbd></div>
+        <div class="shortcut-row"><span>TOGGLE PARAMS</span><kbd>]</kbd></div>
         <div class="shortcut-row"><span>TOGGLE CURSOR</span><kbd>M</kbd></div>
         <div class="shortcut-row"><span>OPEN MEDIA</span><kbd>Ctrl+O</kbd></div>
         <div class="shortcut-row"><span>SAVE FRAME</span><kbd>Ctrl+S</kbd></div>
         <div class="shortcut-row"><span>FULLSCREEN</span><kbd>F</kbd></div>
-        <div class="shortcut-row"><span>CLEAR SKETCH</span><kbd>C</kbd></div>
+        <div class="shortcut-row"><span>RESET SETTINGS</span><kbd>C</kbd></div>
       </div>
     </aside>
 
-    <!-- Column 2: Control Panel -->
-    <aside class="control-panel">
+    <!-- Column 2: Stage Area (Center Viewport) -->
+    <main class="stage-area">
+      <!-- Top Menu -->
+      <header class="top-menu">
+        <!-- 1. Media Controls (on the very left) -->
+        <div class="menu-group">
+          <!-- Upload Media Button -->
+          <button
+            class="icon-btn"
+            id="uploadBtn"
+            data-tooltip="Upload Media (Ctrl+O)"
+            aria-label="Upload Media"
+          >
+            <svg
+              class="lucide lucide-upload"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" x2="12" y1="3" y2="15" />
+            </svg>
+          </button>
+
+          <!-- Live Webcam Button (Toggle on/off) -->
+          <button
+            class="icon-btn"
+            id="webcamBtn"
+            data-tooltip="Start Live Webcam"
+            aria-label="Live Webcam"
+          >
+            <svg
+              class="lucide lucide-camera"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
+              />
+              <circle cx="12" cy="13" r="3" />
+            </svg>
+          </button>
+
+          <!-- Mirror Webcam Button (Disabled when webcam is inactive) -->
+          <button
+            class="icon-btn disabled"
+            id="mirrorWebcamBtn"
+            data-tooltip="Mirror Camera (Webcam Inactive)"
+            disabled
+            aria-label="Mirror Camera"
+          >
+            <svg
+              class="lucide lucide-flip-horizontal-2"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m3 7 5 5-5 5V7" />
+              <path d="m21 7-5 5 5 5V7" />
+              <path d="M12 20v2" />
+              <path d="M12 14v2" />
+              <path d="M12 8v2" />
+              <path d="M12 2v2" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <!-- 2. Extra Controls (next to Media group) -->
+        <div class="menu-group">
+          <!-- Toggle Cursor Interaction Button (Off by default) -->
+          <button
+            class="icon-btn"
+            id="cursorToggleBtn"
+            data-tooltip="Cursor Action: OFF (Press M)"
+            aria-label="Toggle Cursor Action"
+          >
+            <svg
+              class="lucide lucide-mouse-pointer"
+              id="cursorIcon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+              <line x1="2" y1="2" x2="22" y2="22" />
+            </svg>
+          </button>
+
+          <!-- Fullscreen Button -->
+          <button
+            class="icon-btn"
+            id="fullscreenBtn"
+            data-tooltip="Fullscreen (F)"
+            aria-label="Fullscreen"
+          >
+            <svg
+              class="lucide lucide-maximize"
+              id="fsIcon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+            </svg>
+          </button>
+
+          <!-- Save Frame Button -->
+          <button
+            class="icon-btn"
+            id="saveBtn"
+            data-tooltip="Save Frame (Ctrl+S)"
+            aria-label="Save Frame"
+          >
+            <svg
+              class="lucide lucide-download"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="menu-spacer"></div>
+
+        <!-- 3. Active Stats (on right side before Visibility panel) -->
+        <div
+          class="effects-info-bar"
+          id="effectsInfoBar"
+          data-tooltip="Active Effect & Pipeline Stats"
+        >
+          <span class="info-pill effect-name" id="effectPill"
+            >QUADTREE-BOKEH</span
+          >
+          <span class="info-pill source-name" id="sourceBadge"
+            >MOTION-DEMO</span
+          >
+          <span class="info-pill res-badge" id="resPill">960×640</span>
+          <span class="info-pill stats-badge" id="stats">60fps · 1.5ms</span>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <!-- 4. Visibility (on the very right) -->
+        <div class="menu-group">
+          <!-- Collapsible Button for Left Panel -->
+          <button
+            class="icon-btn active"
+            id="toggleDrawerBtn"
+            data-tooltip="Toggle Catalog ([)"
+            data-tooltip-align="right"
+            aria-label="Toggle Catalog"
+          >
+            <svg
+              class="lucide lucide-panel-left"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M9 3v18" />
+            </svg>
+          </button>
+
+          <!-- Collapsible Button for Right Panel -->
+          <button
+            class="icon-btn active"
+            id="togglePanelBtn"
+            data-tooltip="Toggle Parameters (])"
+            data-tooltip-align="right"
+            aria-label="Toggle Parameters"
+          >
+            <svg
+              class="lucide lucide-panel-right"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M15 3v18" />
+            </svg>
+          </button>
+
+          <!-- Toggle Dark Mode Button -->
+          <button
+            class="icon-btn"
+            id="themeBtn"
+            data-tooltip="Toggle Theme (Light/Dark)"
+            data-tooltip-align="right"
+            aria-label="Toggle Theme"
+          >
+            <svg
+              class="lucide lucide-moon"
+              id="themeIcon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Stage Viewport -->
+      <div class="stage-wrap">
+        <div id="stage">
+          <canvas id="canvas"></canvas>
+          <div id="dropHint">
+            <svg
+              class="lucide lucide-download"
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            <span>DROP IMAGE OR VIDEO TO LOAD</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Column 3: Control Panel (Right Parameters Inspector) -->
+    <aside class="control-panel" id="controlPanel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <span>PARAMETERS</span>
+        </div>
+      </div>
+
       <div
         class="uploader-card"
         id="dropCard"
         data-tooltip="Upload Image or Video (Ctrl+O)"
-        data-tooltip-align="left"
+        data-tooltip-align="right"
       >
         <div class="uploader-header">
           <svg
@@ -98,7 +391,7 @@
           class="btn-export"
           id="exportBtn"
           data-tooltip="Save Active Frame as PNG (Ctrl+S)"
-          data-tooltip-align="left"
+          data-tooltip-align="right"
         >
           <span>EXPORT CANVAS</span>
           <kbd>Ctrl+S</kbd>
@@ -106,270 +399,28 @@
       </div>
     </aside>
 
-    <!-- Column 3: Stage Area -->
-    <main class="stage-area">
-      <!-- Top Menu -->
-      <header class="top-menu">
-        <!-- Media Source Buttons -->
-        <div class="menu-group">
-          <!-- Image Dropdown Button -->
-          <div class="dropdown-wrap" id="imageDropdownWrap">
-            <button class="icon-btn" id="imageBtn" data-tooltip="Image Presets & File...">
-              <svg
-                class="lucide lucide-image"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                <circle cx="9" cy="9" r="2" />
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-              </svg>
-            </button>
-            <div class="dropdown-menu" id="imageMenu">
-              <button class="dropdown-item" data-action="open-file">
-                <span>Open Image File...</span>
-                <kbd>Ctrl+O</kbd>
-              </button>
-              <div class="dropdown-sep"></div>
-              <button class="dropdown-item" data-preset="sunset">Sunset Preset</button>
-            </div>
-          </div>
-
-          <!-- Video / Motion Demo Button -->
-          <button class="icon-btn" id="videoBtn" data-tooltip="Video / Motion Demo">
-            <svg
-              class="lucide lucide-film"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M7 3v18" />
-              <path d="M3 7.5h4" />
-              <path d="M3 12h18" />
-              <path d="M3 16.5h4" />
-              <path d="M17 3v18" />
-              <path d="M17 7.5h4" />
-              <path d="M17 16.5h4" />
-            </svg>
-          </button>
-
-          <!-- Webcam Button -->
-          <button class="icon-btn" id="webcamBtn" data-tooltip="Start Live Webcam">
-            <svg
-              class="lucide lucide-camera"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
-              />
-              <circle cx="12" cy="13" r="3" />
-            </svg>
-          </button>
-
-          <!-- Mirror Webcam Button -->
-          <button
-            class="icon-btn active"
-            id="mirrorWebcamBtn"
-            data-tooltip="Mirror Camera: ON (H or Click)"
-          >
-            <svg
-              class="lucide lucide-flip-horizontal-2"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m3 7 5 5-5 5V7" />
-              <path d="m21 7-5 5 5 5V7" />
-              <path d="M12 20v2" />
-              <path d="M12 14v2" />
-              <path d="M12 8v2" />
-              <path d="M12 2v2" />
-            </svg>
-          </button>
-
-          <!-- Stop Webcam Button -->
-          <button
-            class="icon-btn disabled"
-            id="stopWebcamBtn"
-            data-tooltip="Webcam Inactive"
-            disabled
-          >
-            <svg
-              class="lucide lucide-camera-off"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="2" x2="22" y1="2" y2="22" />
-              <path d="M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16" />
-              <path d="M9.5 4h5L17 7h3a2 2 0 0 1 2 2v7.5" />
-              <path d="M14.121 15.121A3 3 0 1 1 9.88 10.88" />
-            </svg>
-          </button>
+    <!-- Confirmation Prompt Modal Dialog -->
+    <div class="confirm-modal-backdrop" id="confirmModal">
+      <div class="confirm-modal-box">
+        <div class="confirm-modal-header">
+          <span class="confirm-modal-badge">[ ! ]</span>
+          <span class="confirm-modal-title">RESET ALL SETTINGS</span>
         </div>
-
-        <div class="menu-divider"></div>
-
-        <!-- Canvas Actions -->
-        <div class="menu-group">
-          <!-- Toggle Cursor Interaction Button -->
-          <button
-            class="icon-btn active"
-            id="cursorToggleBtn"
-            data-tooltip="Cursor Action: ON (Press M)"
-          >
-            <svg
-              class="lucide lucide-mouse-pointer"
-              id="cursorIcon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
-              <path d="m13 13 6 6" />
-            </svg>
-          </button>
-
-          <!-- Fullscreen Button -->
-          <button class="icon-btn" id="fullscreenBtn" data-tooltip="Fullscreen (F)">
-            <svg
-              class="lucide lucide-maximize"
-              id="fsIcon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
-              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
-              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-            </svg>
-          </button>
-
-          <!-- Save Frame Button -->
-          <button class="icon-btn" id="saveBtn" data-tooltip="Save Frame (Ctrl+S)">
-            <svg
-              class="lucide lucide-download"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" x2="12" y1="15" y2="3" />
-            </svg>
-          </button>
+        <div class="confirm-modal-body">
+          Restore all effect parameters to their default values? Current adjustments will be reset.
         </div>
-
-        <div class="menu-spacer"></div>
-
-        <!-- Effects Info Bar -->
-        <div
-          class="effects-info-bar"
-          id="effectsInfoBar"
-          data-tooltip="Active Effect & Pipeline Stats"
-        >
-          <span class="info-pill effect-name" id="effectPill">QUADTREE-BOKEH</span>
-          <span class="info-pill source-name" id="sourceBadge">MOTION-DEMO</span>
-          <span class="info-pill res-badge" id="resPill">960×640</span>
-          <span class="info-pill stats-badge" id="stats">60fps · 1.5ms</span>
-        </div>
-
-        <div class="menu-divider"></div>
-
-        <!-- Theme Toggle Button -->
-        <button
-          class="icon-btn"
-          id="themeBtn"
-          data-tooltip="Toggle Theme (Light/Dark)"
-          data-tooltip-align="right"
-        >
-          <svg
-            class="lucide lucide-moon"
-            id="themeIcon"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-          </svg>
-        </button>
-      </header>
-
-      <!-- Stage Viewport -->
-      <div class="stage-wrap">
-        <div id="stage">
-          <canvas id="canvas"></canvas>
-          <div id="dropHint">
-            <svg
-              class="lucide lucide-download"
-              width="36"
-              height="36"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" x2="12" y1="15" y2="3" />
-            </svg>
-            <span>DROP IMAGE OR VIDEO TO LOAD</span>
-          </div>
+        <div class="confirm-modal-actions">
+          <button class="confirm-btn cancel" id="cancelResetBtn" type="button">
+            <span>CANCEL</span>
+            <kbd>Esc</kbd>
+          </button>
+          <button class="confirm-btn confirm" id="confirmResetBtn" type="button">
+            <span>RESET</span>
+            <kbd>Enter</kbd>
+          </button>
         </div>
       </div>
-    </main>
+    </div>
 
     <!-- Vite ES Module Entry Point -->
     <script type="module" src="./src/main.js"></script>

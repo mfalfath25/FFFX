@@ -36,7 +36,7 @@ export const env = {
     isDown: false,
     lastMoveAt: 0,
   },
-  cursorEnabled: true,
+  cursorEnabled: false,
 
   // Offscreen canvas storing current source frame
   sourceCanvas: offscreenSourceCanvas,

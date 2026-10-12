@@ -11,6 +11,7 @@ export function initStageTools({
   getActiveEffect,
   toggleMirrorWebcam,
   fileInput,
+  resetAllSettings,
 }) {
   const canvas = document.getElementById('canvas');
   const stage = document.getElementById('stage');
@@ -22,6 +23,75 @@ export function initStageTools({
   const themeIcon = document.getElementById('themeIcon');
   const saveBtn = document.getElementById('saveBtn');
   const exportBtn = document.getElementById('exportBtn');
+  const toggleDrawerBtn = document.getElementById('toggleDrawerBtn');
+  const togglePanelBtn = document.getElementById('togglePanelBtn');
+  const confirmModal = document.getElementById('confirmModal');
+  const confirmResetBtn = document.getElementById('confirmResetBtn');
+  const cancelResetBtn = document.getElementById('cancelResetBtn');
+
+  // Left & Right Panels Toggle
+  function setDrawerOpen(isOpen) {
+    if (isOpen) {
+      document.body.classList.remove('drawer-collapsed');
+      if (toggleDrawerBtn) {
+        toggleDrawerBtn.classList.add('active');
+        toggleDrawerBtn.setAttribute('data-tooltip', 'Hide Catalog ([)');
+      }
+    } else {
+      document.body.classList.add('drawer-collapsed');
+      if (toggleDrawerBtn) {
+        toggleDrawerBtn.classList.remove('active');
+        toggleDrawerBtn.setAttribute('data-tooltip', 'Show Catalog ([)');
+      }
+    }
+    try {
+      localStorage.setItem('fffx-drawer-collapsed', String(!isOpen));
+    } catch {}
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function toggleDrawer() {
+    const isCurrentlyCollapsed = document.body.classList.contains('drawer-collapsed');
+    setDrawerOpen(isCurrentlyCollapsed);
+  }
+
+  function setPanelOpen(isOpen) {
+    if (isOpen) {
+      document.body.classList.remove('panel-collapsed');
+      if (togglePanelBtn) {
+        togglePanelBtn.classList.add('active');
+        togglePanelBtn.setAttribute('data-tooltip', 'Hide Parameters (])');
+      }
+    } else {
+      document.body.classList.add('panel-collapsed');
+      if (togglePanelBtn) {
+        togglePanelBtn.classList.remove('active');
+        togglePanelBtn.setAttribute('data-tooltip', 'Show Parameters (])');
+      }
+    }
+    try {
+      localStorage.setItem('fffx-panel-collapsed', String(!isOpen));
+    } catch {}
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function togglePanel() {
+    const isCurrentlyCollapsed = document.body.classList.contains('panel-collapsed');
+    setPanelOpen(isCurrentlyCollapsed);
+  }
+
+  // Restore saved panel states
+  try {
+    if (localStorage.getItem('fffx-drawer-collapsed') === 'true') {
+      setDrawerOpen(false);
+    }
+    if (localStorage.getItem('fffx-panel-collapsed') === 'true') {
+      setPanelOpen(false);
+    }
+  } catch {}
+
+  if (toggleDrawerBtn) toggleDrawerBtn.addEventListener('click', toggleDrawer);
+  if (togglePanelBtn) togglePanelBtn.addEventListener('click', togglePanel);
 
   // Save current frame
   function saveCurrentFrame() {
@@ -87,6 +157,7 @@ export function initStageTools({
   }
 
   if (cursorToggleBtn) cursorToggleBtn.addEventListener('click', () => toggleCursor());
+  toggleCursor(false);
 
   // Theme
   function applyTheme(theme) {
@@ -113,8 +184,68 @@ export function initStageTools({
     });
   }
 
+  // Reset Confirmation Prompt
+  function showResetPrompt() {
+    if (!confirmModal) {
+      if (typeof resetAllSettings === 'function') resetAllSettings();
+      return;
+    }
+    confirmModal.classList.add('open');
+    if (confirmResetBtn) confirmResetBtn.focus();
+  }
+
+  function hideResetPrompt() {
+    if (confirmModal) {
+      confirmModal.classList.remove('open');
+    }
+  }
+
+  function handleConfirmReset() {
+    hideResetPrompt();
+    if (typeof resetAllSettings === 'function') {
+      resetAllSettings();
+    }
+  }
+
+  if (confirmResetBtn) confirmResetBtn.addEventListener('click', handleConfirmReset);
+  if (cancelResetBtn) cancelResetBtn.addEventListener('click', hideResetPrompt);
+  if (confirmModal) {
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) {
+        hideResetPrompt();
+      }
+    });
+  }
+
   // Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
+    // If confirmation prompt is open, trap keys for prompt actions
+    const isPromptOpen = confirmModal && confirmModal.classList.contains('open');
+    if (isPromptOpen) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        e.preventDefault();
+        hideResetPrompt();
+        return;
+      }
+      if (document.activeElement === cancelResetBtn && e.key === 'Enter') {
+        e.preventDefault();
+        hideResetPrompt();
+        return;
+      }
+      if (
+        (e.key === 'Enter' || e.key === 'c' || e.key === 'C') &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        handleConfirmReset();
+        return;
+      }
+      // Suppress studio shortcuts while confirmation prompt is open
+      return;
+    }
+
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
       e.preventDefault();
@@ -131,6 +262,20 @@ export function initStageTools({
     } else if (e.key === 'f' || e.key === 'F') {
       e.preventDefault();
       toggleFullscreen();
+    } else if (e.key === '[' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      toggleDrawer();
+    } else if (e.key === ']' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      togglePanel();
+    } else if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      showResetPrompt();
     }
   });
 
@@ -235,5 +380,7 @@ export function initStageTools({
     toggleFullscreen,
     toggleCursor,
     applyTheme,
+    showResetPrompt,
+    hideResetPrompt,
   };
 }

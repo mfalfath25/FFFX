@@ -39,6 +39,7 @@ initEnv({
 });
 
 // 3. Initialize Parameter Store with Effect Defaults
+const initialDefaults = {};
 effects.forEach((effect) => {
   const defaults = {};
   const grps = effect.getGroups
@@ -49,6 +50,7 @@ effects.forEach((effect) => {
       defaults[c.key] = c.value !== undefined ? c.value : null;
     })
   );
+  initialDefaults[effect.id] = { ...defaults };
   globalParameterStore.initEffect(effect.id, defaults);
 });
 
@@ -63,6 +65,28 @@ function setActiveEffect(effect) {
   panelRenderer.render(activeEffect);
 }
 
+function resetAllSettings() {
+  effects.forEach((effect) => {
+    const defaults = initialDefaults[effect.id] || {};
+    globalParameterStore.values[effect.id] = { ...defaults };
+    const grps = effect.getGroups
+      ? effect.getGroups(defaults)
+      : effect.groups || [];
+    grps.forEach((g) =>
+      g.controls.forEach((c) => {
+        if (typeof c.onChange === 'function' && defaults[c.key] !== undefined) {
+          try {
+            c.onChange(defaults[c.key]);
+          } catch (err) {
+            console.error(`[FFFX Studio] Reset error in ${effect.id}.${c.key}:`, err);
+          }
+        }
+      })
+    );
+  });
+  panelRenderer.render(activeEffect);
+}
+
 const menuController = initMenu({
   menuEl,
   effectPill,
@@ -74,6 +98,7 @@ initStageTools({
   getActiveEffect: () => activeEffect,
   toggleMirrorWebcam,
   fileInput,
+  resetAllSettings,
 });
 
 initMediaControls();
