@@ -10,10 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23111'/><text y='70' x='25' font-size='65' fill='%2300ff88' font-family='monospace'>T</text></svg>"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <!-- MediaPipe Pose for Tracking v2 -->
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
@@ -407,14 +407,19 @@
           <span class="confirm-modal-title">RESET ALL SETTINGS</span>
         </div>
         <div class="confirm-modal-body">
-          Restore all effect parameters to their default values? Current adjustments will be reset.
+          Restore all effect parameters to their default values? Current
+          adjustments will be reset.
         </div>
         <div class="confirm-modal-actions">
           <button class="confirm-btn cancel" id="cancelResetBtn" type="button">
             <span>CANCEL</span>
             <kbd>Esc</kbd>
           </button>
-          <button class="confirm-btn confirm" id="confirmResetBtn" type="button">
+          <button
+            class="confirm-btn confirm"
+            id="confirmResetBtn"
+            type="button"
+          >
             <span>RESET</span>
             <kbd>Enter</kbd>
           </button>
