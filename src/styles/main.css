@@ -446,6 +446,101 @@ canvas {
 }
 
 /* ======================================================================
+   Video Playback Controls Bar (Bottom of Stage Area)
+   ====================================================================== */
+.video-playback-bar {
+  height: var(--top-bar-height);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  user-select: none;
+  position: relative;
+  z-index: 100;
+}
+.video-playback-bar.hidden {
+  display: none !important;
+}
+
+.playback-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 2px;
+}
+
+.playback-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playback-play-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.playback-timeline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.playback-time {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+}
+
+.playback-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.playback-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 2px 5px;
+  min-width: 38px;
+  text-align: center;
+}
+
+.playback-slider-wrap {
+  display: flex;
+  align-items: center;
+}
+.playback-slider-wrap.progress-wrap {
+  flex: 1;
+}
+.playback-slider-wrap.speed-wrap {
+  width: 90px;
+}
+.playback-slider-wrap.volume-wrap {
+  width: 80px;
+}
+
+.playback-slider-wrap input[type='range'] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.icon-btn.muted {
+  color: var(--text-dim);
+}
+
+/* ======================================================================
    Column 3: Control Panel (Right Parameters Inspector)
    ====================================================================== */
 .control-panel {

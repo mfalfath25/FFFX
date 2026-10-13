@@ -10,7 +10,9 @@ import {
   initMotionDemo,
   initMediaControls,
   toggleMirrorWebcam,
+  setVideoController,
 } from './core/media.js';
+import { initVideoControls } from './ui/video-controls.js';
 import { initMenu } from './ui/menu.js';
 import { PanelRenderer } from './ui/renderers/panel-renderer.js';
 import { initStageTools } from './ui/stage-tools.js';
@@ -101,6 +103,9 @@ initStageTools({
   resetAllSettings,
 });
 
+const videoController = initVideoControls();
+setVideoController(videoController);
+
 initMediaControls();
 
 // Render initial navigation & controls
@@ -144,6 +149,9 @@ function frame(now) {
       env.sourceCtx.drawImage(env.sourceVideo, 0, 0, env.W, env.H);
     }
     buildTables(env.sourceCtx.getImageData(0, 0, env.W, env.H));
+    if (videoController) {
+      videoController.updateFrame();
+    }
   }
 
   // Step 2: Draw active effect

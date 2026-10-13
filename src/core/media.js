@@ -64,11 +64,21 @@ export function updateWebcamUI(active) {
   updateMirrorWebcamUI();
 }
 
+let videoController = null;
+
+export function setVideoController(ctrl) {
+  videoController = ctrl;
+}
+
 export function stopActiveMedia() {
+  if (videoController) {
+    videoController.hide();
+  }
   if (env.sourceVideo) {
     env.sourceVideo.pause();
     if (env.sourceVideo.srcObject) {
-      env.sourceVideo.srcObject.getTracks().forEach((t) => t.stop());
+      env.sourceVideo.getTracks?.() ||
+        env.sourceVideo.srcObject.getTracks().forEach((t) => t.stop());
     }
     env.sourceVideo = null;
   }
@@ -120,10 +130,13 @@ export function loadMediaFile(file) {
     const video = document.createElement('video');
     video.src = URL.createObjectURL(file);
     video.loop = true;
-    video.muted = true;
     video.playsInline = true;
-    video.play().catch(() => {});
+    video.autoplay = true;
     loadVideoElement(video, 'VIDEO FILE');
+    video.play().catch(() => {});
+    if (videoController) {
+      videoController.show(video);
+    }
     updateDrawerSources('');
   } else if (file.type.startsWith('image/')) {
     const url = URL.createObjectURL(file);
